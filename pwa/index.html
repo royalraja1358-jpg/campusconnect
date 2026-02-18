@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CampusConnect</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CampusConnect">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{--bg:#f0f4ff;--surface:#fff;--card:#fff;--border:#e4eaf5;--primary:#2563eb;--primary-light:#eff4ff;--secondary:#7c3aed;--accent:#059669;--warning:#d97706;--danger:#dc2626;--text:#0f172a;--text2:#475569;--text3:#94a3b8;--nav-h:68px;--radius:16px;--shadow-sm:0 2px 8px rgba(0,0,0,.06);}
+html,body{font-family:"Plus Jakarta Sans",sans-serif;background:var(--bg);margin:0;padding:0;width:100%;height:100%;overflow:hidden;-webkit-text-size-adjust:100%;}
+.phone{width:100vw;height:100vh;height:100dvh;background:var(--bg);position:fixed;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;overflow:hidden;}
+.screen{display:none;flex-direction:column;flex:1;overflow:hidden;}.screen.animating{animation:fadeIn .2s ease;}
+.screen.active{display:flex;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.scroll-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.scroll-content::-webkit-scrollbar{display:none;}
+.app-header{height:60px;background:var(--surface);display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;border-bottom:1px solid var(--border);}
+.header-left{display:flex;align-items:center;gap:10px;}
+.header-avatar{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;font-weight:700;cursor:pointer;}
+.header-name{font-size:15px;font-weight:700;color:var(--text);}
+.header-greeting{font-size:11px;color:var(--text3);}
+.icon-btn{width:36px;height:36px;border-radius:12px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;touch-action:manipulation;position:relative;}
+.badge{position:absolute;top:-4px;right:-4px;width:16px;height:16px;background:var(--danger);border-radius:50%;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid #fff;}
+.back-btn{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:600;color:var(--primary);cursor:pointer;touch-action:manipulation;border:none;background:transparent;font-family:inherit;padding:0;}
+.bottom-nav{height:var(--nav-h);background:var(--surface);display:flex;align-items:center;border-top:1px solid var(--border);padding:0 4px 6px;flex-shrink:0;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;cursor:pointer;touch-action:manipulation;border-radius:12px;border:none;background:transparent;font-family:inherit;}
+.nav-icon{font-size:22px;line-height:1;}
+.nav-label{font-size:10px;font-weight:600;color:var(--text3);}
+.nav-item.active .nav-label{color:var(--primary);}
+.nav-center-btn{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:22px;margin-top:-18px;box-shadow:0 8px 20px rgba(37,99,235,.35);cursor:pointer;touch-action:manipulation;flex-shrink:0;border:none;}
+.card{background:var(--card);border-radius:var(--radius);padding:15px;border:1px solid var(--border);box-shadow:var(--shadow-sm);margin-bottom:10px;}
+.section-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:11px;display:flex;justify-content:space-between;align-items:center;}
+.section-title a{font-size:12px;font-weight:600;color:var(--primary);cursor:pointer;}
+.btn-primary{width:100%;padding:14px;border-radius:14px;background:var(--primary);color:#fff;font-family:inherit;font-size:15px;font-weight:700;border:none;cursor:pointer;touch-action:manipulation;margin-top:8px;}
+.btn-sm{padding:8px 12px;border-radius:10px;font-size:12px;font-weight:700;border:none;cursor:pointer;touch-action:manipulation;font-family:inherit;}
+.btn-outline{background:var(--primary-light);color:var(--primary);}
+.btn-fill{background:var(--primary);color:#fff;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.stat-card{background:var(--card);border-radius:var(--radius);padding:13px;border:1px solid var(--border);box-shadow:var(--shadow-sm);cursor:pointer;}
+.stat-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.stat-value{font-size:24px;font-weight:800;color:var(--text);line-height:1;}
+.stat-sub{font-size:11px;color:var(--text2);margin-top:3px;}
+.stat-bar{height:4px;background:var(--border);border-radius:99px;margin-top:8px;}
+.stat-bar-fill{height:100%;border-radius:99px;}
+.c-blue{color:#2563eb;}.c-purple{color:#7c3aed;}.c-green{color:#059669;}.c-orange{color:#d97706;}.c-red{color:#dc2626;}
+.bg-blue{background:#eff6ff;}.bg-purple{background:#f5f3ff;}.bg-green{background:#ecfdf5;}.bg-orange{background:#fffbeb;}.bg-red{background:#fef2f2;}
+.grade-badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;}
+.class-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:11px 18px;border-radius:12px;font-size:13px;font-weight:600;white-space:nowrap;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;}
+.toast.show{opacity:1;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:#fff;border-radius:24px 24px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding:20px 18px 36px;-webkit-overflow-scrolling:touch;}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:99px;margin:0 auto 18px;}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:16px;}
+.input-group{margin-bottom:13px;}
+.input-group label{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px;letter-spacing:.04em;text-transform:uppercase;}
+.input-group input,.input-group select,.input-group textarea{width:100%;padding:11px 13px;border-radius:11px;border:2px solid var(--border);background:var(--bg);font-family:inherit;font-size:14px;color:var(--text);outline:none;transition:border-color .2s;appearance:none;}
+.input-group input:focus,.input-group select:focus,.input-group textarea:focus{border-color:var(--primary);background:#fff;}
+.input-group textarea{resize:none;height:78px;}
+/* LOGIN */
+#screen-login{background:linear-gradient(160deg,#1e3a8a,#2563eb 40%,#60a5fa);justify-content:flex-end;}
+.login-hero{position:absolute;top:0;left:0;right:0;padding:70px 24px 30px;color:#fff;z-index:1;}
+.login-logo{font-size:11px;letter-spacing:.15em;text-transform:uppercase;opacity:.7;font-weight:600;margin-bottom:12px;}
+.login-title{font-family:"Instrument Serif",serif;font-size:40px;line-height:1.1;margin-bottom:8px;}
+.login-title em{font-style:italic;opacity:.85;}
+.login-sub{font-size:13px;opacity:.65;line-height:1.5;}
+.login-card{background:#fff;border-radius:26px 26px 0 0;padding:26px 18px 36px;z-index:2;}
+.login-card h2{font-size:20px;font-weight:800;margin-bottom:4px;}
+.login-card p{font-size:13px;color:var(--text2);margin-bottom:18px;}
+/* SIDEBAR */
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:800;display:none;}
+.sidebar-overlay.open{display:block;}
+.sidebar{position:fixed;top:0;left:-300px;width:300px;height:100%;background:#fff;z-index:900;transition:left .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;}
+.sidebar.open{left:0;}
+.sidebar-header{padding:0;flex-shrink:0;}
+.sidebar-profile{background:linear-gradient(135deg,#2563eb,#7c3aed);padding:28px 18px 20px;cursor:pointer;}
+.sidebar-avatar{width:64px;height:64px;border-radius:18px;border:3px solid rgba(255,255,255,.4);overflow:hidden;margin-bottom:10px;}
+.sidebar-avatar img{width:100%;height:100%;object-fit:cover;}
+.sidebar-uname{font-size:17px;font-weight:800;color:#fff;margin-bottom:2px;}
+.sidebar-regno{font-size:12px;color:rgba(255,255,255,.75);margin-bottom:2px;}
+.sidebar-prog{font-size:11px;color:rgba(255,255,255,.6);}
+.sidebar-scroll{flex:1;overflow-y:auto;scrollbar-width:none;padding-bottom:20px;}
+.sidebar-scroll::-webkit-scrollbar{display:none;}
+.sidebar-section{padding:12px 16px 4px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;}
+.sidebar-item{display:flex;align-items:center;gap:13px;padding:12px 18px;cursor:pointer;touch-action:manipulation;transition:background .15s;}
+.sidebar-item:active{background:var(--bg);}
+.sidebar-item-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.sidebar-item-label{font-size:13px;font-weight:600;color:var(--text);}
+.sidebar-item-sub{font-size:10px;color:var(--text3);margin-top:1px;}
+.sidebar-divider{height:1px;background:var(--border);margin:6px 16px;}
+/* WELCOME BANNER */
+.welcome-banner{background:linear-gradient(135deg,#2563eb,#6366f1);border-radius:var(--radius);padding:16px;margin-bottom:14px;color:#fff;position:relative;overflow:hidden;}
+.welcome-banner::after{content:"⚗️";position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:40px;opacity:.2;}
+/* QUICK ACTIONS */
+.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.qa-item{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;touch-action:manipulation;}
+.qa-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:21px;border:1px solid var(--border);box-shadow:var(--shadow-sm);}
+.qa-label{font-size:10px;font-weight:600;color:var(--text2);text-align:center;}
+/* TIMETABLE */
+.day-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none;}
+.day-tabs::-webkit-scrollbar{display:none;}
+.day-chip{flex-shrink:0;min-width:46px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px;border-radius:11px;border:2px solid var(--border);background:var(--card);cursor:pointer;touch-action:manipulation;}
+.day-chip .d-day{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;}
+.day-chip.active{background:var(--primary);border-color:var(--primary);}
+.day-chip.active .d-day{color:#fff;}
+.class-item{display:flex;gap:10px;align-items:flex-start;padding:12px;background:var(--card);border-radius:13px;border:1px solid var(--border);margin-bottom:7px;}
+.class-time{font-size:10px;font-weight:700;color:var(--text2);width:50px;flex-shrink:0;padding-top:2px;}
+.class-dot{width:3px;border-radius:3px;align-self:stretch;flex-shrink:0;}
+.class-info{flex:1;}
+.class-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.class-code{font-size:10px;color:var(--primary);font-weight:700;}
+.class-meta{font-size:11px;color:var(--text2);}
+/* ATTENDANCE */
+.att-subject{background:var(--card);border-radius:var(--radius);padding:14px;border:1px solid var(--border);margin-bottom:9px;cursor:pointer;touch-action:manipulation;}
+.att-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.att-name{font-size:14px;font-weight:700;color:var(--text);}
+.att-subcode{font-size:10px;color:var(--primary);font-weight:700;}
+.att-pct{font-size:18px;font-weight:800;}
+.att-bar-bg{height:7px;background:var(--border);border-radius:99px;}
+.att-bar-fill{height:100%;border-radius:99px;}
+.att-foot{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:5px;align-items:flex-end;}
+.att-foot-staff{text-align:right;}
+.att-class-item{display:flex;align-items:center;gap:10px;padding:10px 13px;background:var(--card);border-radius:11px;border:1px solid var(--border);margin-bottom:6px;}
+.att-class-date{font-size:11px;font-weight:700;color:var(--text2);width:65px;flex-shrink:0;}
+.att-class-info{flex:1;}
+.att-class-subject{font-size:12px;font-weight:600;color:var(--text);}
+.att-class-staff{font-size:10px;color:var(--text3);}
+.att-status{font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;flex-shrink:0;}
+/* MARKS */
+.sem-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:9px;overflow:hidden;cursor:pointer;touch-action:manipulation;}
+.sem-header{display:flex;justify-content:space-between;align-items:center;padding:14px 15px;}
+.sem-title{font-size:14px;font-weight:700;color:var(--text);}
+.sem-sgpa{font-size:17px;font-weight:800;}
+.sem-body{display:none;border-top:1px solid var(--border);}
+.sem-body.open{display:block;}
+.marks-table{width:100%;border-collapse:collapse;}
+.marks-table th{font-size:10px;font-weight:700;color:var(--text3);text-align:left;padding:7px 11px;text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--border);}
+.marks-table td{font-size:12px;padding:10px 11px;border-bottom:1px solid var(--border);color:var(--text);}
+.marks-table tr:last-child td{border-bottom:none;}
+/* ASSIGNMENTS */
+.assign-item{background:var(--card);border-radius:var(--radius);padding:14px;border:1px solid var(--border);margin-bottom:9px;}
+.assign-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px;}
+.assign-title{font-size:13px;font-weight:700;color:var(--text);}
+.assign-subject{font-size:11px;color:var(--text2);margin-top:2px;}
+/* EVENTS */
+.event-card{border-radius:var(--radius);overflow:hidden;margin-bottom:11px;border:1px solid var(--border);}
+.event-banner{height:88px;display:flex;align-items:center;justify-content:center;font-size:36px;}
+.event-body{background:var(--card);padding:12px 14px;}
+.event-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:5px;}
+.event-meta{font-size:11px;color:var(--text2);display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.btn-event{padding:9px 16px;border-radius:11px;background:var(--primary);color:#fff;font-size:12px;font-weight:700;border:none;cursor:pointer;touch-action:manipulation;font-family:inherit;}
+/* MESSAGES */
+.msg-item{display:flex;gap:11px;align-items:center;padding:11px;background:var(--card);border-radius:13px;border:1px solid var(--border);cursor:pointer;touch-action:manipulation;margin-bottom:7px;}
+.msg-avatar{width:42px;height:42px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:19px;}
+.msg-body{flex:1;min-width:0;}
+.msg-name{font-size:13px;font-weight:700;color:var(--text);}
+.msg-preview{font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.msg-time{font-size:10px;color:var(--text3);}
+.msg-unread{width:8px;height:8px;background:var(--primary);border-radius:50%;flex-shrink:0;}
+/* CHAT */
+.chat-header{display:flex;align-items:center;gap:11px;padding:11px 14px;background:var(--surface);border-bottom:1px solid var(--border);}
+.chat-messages{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;display:flex;flex-direction:column;gap:9px;}
+.msg-bubble{max-width:78%;padding:10px 13px;border-radius:16px;font-size:13px;line-height:1.5;}
+.msg-bubble.sent{background:var(--primary);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+.msg-bubble.recv{background:var(--card);color:var(--text);align-self:flex-start;border:1px solid var(--border);border-bottom-left-radius:4px;}
+.bubble-time{font-size:10px;opacity:.65;margin-top:3px;text-align:right;}
+.chat-input-bar{background:var(--surface);border-top:1px solid var(--border);padding:9px 13px;display:flex;gap:8px;align-items:center;}
+.chat-input{flex:1;padding:10px 13px;border-radius:11px;border:2px solid var(--border);background:var(--bg);font-family:inherit;font-size:14px;color:var(--text);outline:none;}
+.chat-send{width:40px;height:40px;border-radius:11px;background:var(--primary);border:none;color:#fff;font-size:17px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;}
+/* PERFORMANCE */
+.graph-container{background:var(--card);border-radius:var(--radius);padding:16px;border:1px solid var(--border);margin-bottom:13px;}
+.graph-bars{display:flex;align-items:flex-end;gap:8px;height:120px;margin-bottom:8px;}
+.graph-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;}
+/* PROFILE */
+.profile-hero{background:linear-gradient(135deg,#2563eb,#7c3aed);padding:22px 18px 18px;margin:-14px -14px 16px;text-align:center;color:#fff;}
+.profile-avatar-lg{width:80px;height:80px;border-radius:20px;border:3px solid rgba(255,255,255,.4);overflow:hidden;margin:0 auto 10px;}
+.profile-avatar-lg img{width:100%;height:100%;object-fit:cover;}
+.profile-name{font-size:18px;font-weight:800;margin-bottom:2px;}
+.profile-regno{font-size:13px;opacity:.85;font-weight:600;margin-bottom:2px;}
+.profile-role{font-size:11px;opacity:.7;}
+.profile-item{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--border);}
+.profile-item:last-child{border-bottom:none;}
+.profile-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.profile-item-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+.profile-item-value{font-size:13px;font-weight:600;color:var(--text);margin-top:1px;}
+/* NOTIFICATIONS */
+.notif-item{display:flex;gap:11px;align-items:flex-start;padding:12px;background:var(--card);border-radius:13px;border:1px solid var(--border);margin-bottom:7px;}
+.notif-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.notif-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.notif-desc{font-size:11px;color:var(--text2);line-height:1.4;}
+.notif-time{font-size:10px;color:var(--text3);margin-top:3px;}
+.notif-dot{width:8px;height:8px;background:var(--primary);border-radius:50%;flex-shrink:0;margin-top:4px;}
+/* LEAVE */
+.leave-item{display:flex;justify-content:space-between;align-items:center;padding:11px;background:var(--card);border-radius:12px;border:1px solid var(--border);margin-bottom:7px;}
+.leave-type{font-size:13px;font-weight:700;color:var(--text);}
+.leave-dates{font-size:11px;color:var(--text2);margin-top:2px;}
+.leave-status{font-size:11px;font-weight:700;padding:4px 11px;border-radius:99px;}
+/* ANNOUNCEMENT */
+.announce-item{background:var(--card);border-radius:var(--radius);padding:13px;border:1px solid var(--border);margin-bottom:8px;border-left:4px solid var(--primary);}
+.announce-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.announce-body{font-size:11px;color:var(--text2);line-height:1.4;margin-bottom:5px;}
+.announce-meta{font-size:10px;color:var(--text3);}
+/* EXAM */
+.exam-item{background:var(--card);border-radius:var(--radius);padding:14px;border:1px solid var(--border);margin-bottom:9px;}
+.exam-code{font-size:10px;font-weight:700;color:var(--primary);margin-bottom:3px;}
+.exam-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.exam-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.exam-detail{background:var(--bg);border-radius:9px;padding:7px 10px;}
+.exam-detail-label{font-size:9px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:2px;}
+.exam-detail-val{font-size:12px;font-weight:700;color:var(--text);}
+/* FEEDBACK */
+.feedback-item{background:var(--card);border-radius:var(--radius);padding:14px;border:1px solid var(--border);margin-bottom:9px;}
+.feedback-subname{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.feedback-code{font-size:10px;color:var(--primary);font-weight:700;margin-bottom:10px;}
+.star-row{display:flex;gap:6px;margin-bottom:8px;}
+.star{font-size:24px;cursor:pointer;opacity:.35;transition:opacity .15s;}
+.star.active{opacity:1;}
+.feedback-label{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px;}
+/* FEE */
+.fee-item{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);}
+.fee-item:last-child{border-bottom:none;}
+.fee-name{font-size:13px;font-weight:600;color:var(--text);}
+.fee-amount{font-size:13px;font-weight:800;}
+/* TEACHER LEAVE */
+.teacher-item{background:var(--card);border-radius:var(--radius);padding:13px;border:1px solid var(--border);margin-bottom:8px;cursor:pointer;touch-action:manipulation;}
+.teacher-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.teacher-id{font-size:10px;color:var(--text3);font-weight:600;}
+/* CANTEEN */
+.shop-card{background:var(--card);border-radius:var(--radius);padding:14px;border:1px solid var(--border);margin-bottom:9px;cursor:pointer;touch-action:manipulation;}
+.shop-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.shop-name{font-size:14px;font-weight:800;color:var(--text);}
+.shop-location{font-size:10px;color:var(--text3);}
+.shop-status{font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;}
+.menu-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+.menu-item:last-child{border-bottom:none;}
+.menu-name{font-size:13px;font-weight:600;color:var(--text);}
+.menu-price{font-size:13px;font-weight:800;color:var(--primary);}
+.menu-add{width:28px;height:28px;border-radius:8px;background:var(--primary);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+/* REMINDER */
+.reminder-item{background:var(--card);border-radius:var(--radius);padding:12px 14px;border:1px solid var(--border);margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;}
+.reminder-text{font-size:13px;font-weight:600;color:var(--text);}
+.reminder-time{font-size:10px;color:var(--text3);margin-top:2px;}
+.reminder-del{background:none;border:none;color:var(--danger);font-size:18px;cursor:pointer;padding:0;}
+/* MAP */
+.map-area{background:linear-gradient(135deg,#e0f2fe,#dbeafe);border-radius:var(--radius);height:220px;position:relative;overflow:hidden;margin-bottom:14px;border:1px solid var(--border);}
+.map-room{position:absolute;background:#fff;border:2px solid var(--primary);border-radius:8px;padding:4px 8px;font-size:10px;font-weight:700;color:var(--primary);cursor:pointer;}
+/* LOST FOUND */
+.lost-item{background:var(--card);border-radius:var(--radius);padding:13px;border:1px solid var(--border);margin-bottom:8px;}
+.lost-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;display:inline-block;margin-bottom:6px;}
+/* HOSTEL */
+.complaint-item{background:var(--card);border-radius:var(--radius);padding:13px;border:1px solid var(--border);margin-bottom:8px;}
+/* BUS */
+.bus-item{background:var(--card);border-radius:var(--radius);padding:13px;border:1px solid var(--border);margin-bottom:8px;display:flex;gap:12px;align-items:center;}
+/* LIBRARY */
+.book-item{background:var(--card);border-radius:var(--radius);padding:13px;border:1px solid var(--border);margin-bottom:8px;}
+/* ID CARD */
+.id-card{background:linear-gradient(135deg,#1e3a8a,#2563eb);border-radius:18px;padding:20px;color:#fff;margin-bottom:14px;position:relative;overflow:hidden;}
+.id-card::after{content:"⚗️";position:absolute;right:-10px;bottom:-10px;font-size:80px;opacity:.08;}
+/* AI SUGGESTIONS */
+.ai-suggestion{background:linear-gradient(135deg,#f5f3ff,#eff6ff);border-radius:var(--radius);padding:14px;border:1px solid #c4b5fd;margin-bottom:9px;}
+.ai-badge{font-size:9px;font-weight:700;background:#7c3aed;color:#fff;padding:2px 7px;border-radius:99px;display:inline-block;margin-bottom:5px;}
+.ai-text{font-size:12px;color:var(--text);line-height:1.5;}
+/* RISK ALERT */
+.risk-banner{background:linear-gradient(135deg,#fef2f2,#fff7ed);border-radius:var(--radius);padding:13px;border:1px solid #fca5a5;margin-bottom:11px;}
+.risk-title{font-size:13px;font-weight:700;color:#dc2626;margin-bottom:4px;}
+.risk-item{font-size:11px;color:#7f1d1d;margin-bottom:3px;}
+/* RATING STARS */
+.rating-display{display:flex;gap:2px;}
+.rating-star{font-size:13px;}
+</style>
+</head>
+<body>
+<div class="phone">
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-profile" onclick="closeSidebar();navigate('profile')">
+      <div class="sidebar-avatar"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Raja&backgroundColor=b6e3f4" alt="Raja M"></div>
+      <div class="sidebar-uname">Raja M</div>
+      <div class="sidebar-regno">Reg. No: 12305182</div>
+      <div class="sidebar-prog">B.Tech Chemical Engineering</div>
+    </div>
+  </div>
+  <div class="sidebar-scroll">
+    <div class="sidebar-section">Academics</div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('timetable')"><div class="sidebar-item-icon bg-blue">📅</div><div><div class="sidebar-item-label">Timetable</div><div class="sidebar-item-sub">25 classes/week</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('attendance')"><div class="sidebar-item-icon bg-green">✅</div><div><div class="sidebar-item-label">Attendance</div><div class="sidebar-item-sub">Section: ChE-6A</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('marks')"><div class="sidebar-item-icon bg-purple">📊</div><div><div class="sidebar-item-label">Marks & Results</div><div class="sidebar-item-sub">CGPA: 7.58</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('assignments')"><div class="sidebar-item-icon bg-orange">📁</div><div><div class="sidebar-item-label">Assignments</div><div class="sidebar-item-sub">3 pending</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('exams')"><div class="sidebar-item-icon bg-red">📝</div><div><div class="sidebar-item-label">Exam Schedule</div><div class="sidebar-item-sub">Next: Mar 10</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('feedback')"><div class="sidebar-item-icon bg-blue">⭐</div><div><div class="sidebar-item-label">Feedback</div><div class="sidebar-item-sub">Rate your subjects</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('performance')"><div class="sidebar-item-icon bg-green">📈</div><div><div class="sidebar-item-label">Performance</div><div class="sidebar-item-sub">AI suggestions</div></div></div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">Campus Life</div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('events')"><div class="sidebar-item-icon bg-red">🎉</div><div><div class="sidebar-item-label">Campus Events</div><div class="sidebar-item-sub">4 upcoming</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('canteen')"><div class="sidebar-item-icon bg-orange">🍽️</div><div><div class="sidebar-item-label">Canteen Menu</div><div class="sidebar-item-sub">10 shops · Live menu</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('campus-map')"><div class="sidebar-item-icon bg-blue">🗺️</div><div><div class="sidebar-item-label">Campus Map</div><div class="sidebar-item-sub">Indoor navigation</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('bus-tracking')"><div class="sidebar-item-icon bg-green">🚌</div><div><div class="sidebar-item-label">Bus Tracking</div><div class="sidebar-item-sub">Live location</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('library')"><div class="sidebar-item-icon bg-purple">📚</div><div><div class="sidebar-item-label">Library</div><div class="sidebar-item-sub">Book tracking</div></div></div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">Services</div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('leave')"><div class="sidebar-item-icon bg-orange">📋</div><div><div class="sidebar-item-label">Leave Application</div><div class="sidebar-item-sub">Track approval</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('fee-details')"><div class="sidebar-item-icon bg-green">💰</div><div><div class="sidebar-item-label">Fee Details</div><div class="sidebar-item-sub">Payment history</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('hostel')"><div class="sidebar-item-icon bg-blue">🏠</div><div><div class="sidebar-item-label">Hostel Complaints</div><div class="sidebar-item-sub">Raise & track issues</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('id-card')"><div class="sidebar-item-icon bg-purple">🪪</div><div><div class="sidebar-item-label">Digital ID Card</div><div class="sidebar-item-sub">View & download</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('teacher-leave')"><div class="sidebar-item-icon bg-orange">👨‍🏫</div><div><div class="sidebar-item-label">Teacher on Leave</div><div class="sidebar-item-sub">Today's absences</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('reminders')"><div class="sidebar-item-icon bg-red">⏰</div><div><div class="sidebar-item-label">Reminders</div><div class="sidebar-item-sub">Custom alerts</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('lost-found')"><div class="sidebar-item-icon bg-orange">🔍</div><div><div class="sidebar-item-label">Lost & Found</div><div class="sidebar-item-sub">Report & search</div></div></div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">Communication</div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('messages')"><div class="sidebar-item-icon bg-blue">💬</div><div><div class="sidebar-item-label">Messages</div><div class="sidebar-item-sub">2 unread</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('notifications')"><div class="sidebar-item-icon bg-red">🔔</div><div><div class="sidebar-item-label">Notifications</div><div class="sidebar-item-sub">3 new</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('announcements')"><div class="sidebar-item-icon bg-purple">📣</div><div><div class="sidebar-item-label">Announcements</div><div class="sidebar-item-sub">Board</div></div></div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">Account</div>
+    <div class="sidebar-item" onclick="closeSidebar();navigate('profile')"><div class="sidebar-item-icon bg-blue">👤</div><div><div class="sidebar-item-label">My Profile</div><div class="sidebar-item-sub">Personal & academic</div></div></div>
+    <div class="sidebar-item" onclick="closeSidebar();showToast('Settings coming soon')"><div class="sidebar-item-icon bg-purple">⚙️</div><div><div class="sidebar-item-label">Settings</div></div></div>
+    <div class="sidebar-item" onclick="doLogout()"><div class="sidebar-item-icon bg-red">🚪</div><div><div class="sidebar-item-label" style="color:#dc2626">Sign Out</div></div></div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="screen-login" class="screen active">
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;overflow:hidden;pointer-events:none">
+    <div style="position:absolute;width:260px;height:260px;background:rgba(255,255,255,.06);border-radius:50%;top:-50px;right:-60px;"></div>
+    <div style="position:absolute;width:160px;height:160px;background:rgba(255,255,255,.04);border-radius:50%;top:120px;left:-40px;"></div>
+  </div>
+  <div class="login-hero">
+    <div class="login-logo">CampusConnect</div>
+    <div class="login-title">Your campus,<br><em>connected.</em></div>
+    <div class="login-sub">Attendance, marks, events &amp; more</div>
+  </div>
+  <div class="login-card">
+    <h2>Welcome back 👋</h2>
+    <p>Sign in to your student account</p>
+    <div class="input-group"><label>Email / Roll No</label><input type="text" placeholder="12305182" value="12305182" id="login-roll"></div>
+    <div class="input-group"><label>Password</label><input type="password" placeholder="••••••••" value="password123"></div>
+    <button class="btn-primary" onclick="doLogin()" type="button">Sign In →</button>
+    <div style="text-align:center;margin-top:12px"><span onclick="showForgotPassword()" style="font-size:12px;color:var(--primary);font-weight:600;cursor:pointer">Forgot Password?</span></div>
+    <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text3)">Secured with JWT · bcrypt encryption</div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="screen-home" class="screen">
+  <div class="app-header">
+    <div class="header-left">
+      <div class="header-avatar" onclick="openSidebar()">R</div>
+      <div><div class="header-greeting">Good morning ☀️</div><div class="header-name">Raja M</div></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <div class="icon-btn" onclick="navigate('notifications')">🔔<span class="badge">3</span></div>
+      <div class="icon-btn" onclick="navigate('messages')">💬<span class="badge">2</span></div>
+    </div>
+  </div>
+  <div class="scroll-content">
+    <!-- Attendance Risk Alert -->
+    <div class="risk-banner" onclick="navigate('attendance')">
+      <div class="risk-title">⚠️ Attendance Risk Alert</div>
+      <div class="risk-item">• CH6005 Process Control — 68% (Need 5 more classes)</div>
+      <div class="risk-item">• CH6004 Heat Transfer — 76% (Border line)</div>
+    </div>
+    <div class="welcome-banner">
+      <div style="font-size:11px;opacity:.75;font-weight:600;margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em">Semester 6 · ChE · Section A</div>
+      <div style="font-size:18px;font-weight:800;margin-bottom:2px">3 classes today</div>
+      <div style="font-size:12px;opacity:.75">Next: CH6002 Mass Transfer at 10:30 AM</div>
+    </div>
+    <!-- Quick Actions 12 items -->
+    <div class="quick-actions">
+      <div class="qa-item" onclick="navigate('timetable')"><div class="qa-icon bg-blue">📅</div><div class="qa-label">Timetable</div></div>
+      <div class="qa-item" onclick="navigate('attendance')"><div class="qa-icon bg-green">✅</div><div class="qa-label">Attendance</div></div>
+      <div class="qa-item" onclick="navigate('marks')"><div class="qa-icon bg-purple">📊</div><div class="qa-label">Marks</div></div>
+      <div class="qa-item" onclick="navigate('assignments')"><div class="qa-icon bg-orange">📁</div><div class="qa-label">Assignments</div></div>
+      <div class="qa-item" onclick="navigate('exams')"><div class="qa-icon bg-red">📝</div><div class="qa-label">Exams</div></div>
+      <div class="qa-item" onclick="navigate('feedback')"><div class="qa-icon bg-blue">⭐</div><div class="qa-label">Feedback</div></div>
+      <div class="qa-item" onclick="navigate('teacher-leave')"><div class="qa-icon bg-orange">👨‍🏫</div><div class="qa-label">On Leave</div></div>
+      <div class="qa-item" onclick="navigate('fee-details')"><div class="qa-icon bg-green">💰</div><div class="qa-label">Fees</div></div>
+      <div class="qa-item" onclick="navigate('events')"><div class="qa-icon bg-red">🎉</div><div class="qa-label">Events</div></div>
+      <div class="qa-item" onclick="navigate('canteen')"><div class="qa-icon bg-orange">🍽️</div><div class="qa-label">Canteen</div></div>
+      <div class="qa-item" onclick="navigate('performance')"><div class="qa-icon bg-purple">📈</div><div class="qa-label">Performance</div></div>
+      <div class="qa-item" onclick="navigate('announcements')"><div class="qa-icon bg-blue">📣</div><div class="qa-label">Notice</div></div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card" onclick="navigate('attendance')"><div class="stat-label">Attendance</div><div class="stat-value c-green">79%</div><div class="stat-sub">6 subjects</div><div class="stat-bar"><div class="stat-bar-fill" style="width:79%;background:#059669"></div></div></div>
+      <div class="stat-card" onclick="navigate('marks')"><div class="stat-label">CGPA</div><div class="stat-value c-blue">7.58</div><div class="stat-sub">Sem 6</div><div class="stat-bar"><div class="stat-bar-fill" style="width:75.8%;background:#2563eb"></div></div></div>
+      <div class="stat-card" onclick="navigate('assignments')"><div class="stat-label">Assignments</div><div class="stat-value c-orange">3</div><div class="stat-sub">Due this week</div><div class="stat-bar"><div class="stat-bar-fill" style="width:30%;background:#d97706"></div></div></div>
+      <div class="stat-card" onclick="navigate('fee-details')"><div class="stat-label">Fee Due</div><div class="stat-value c-red">₹18k</div><div class="stat-sub">Mar 31 deadline</div><div class="stat-bar"><div class="stat-bar-fill" style="width:60%;background:#dc2626"></div></div></div>
+    </div>
+    <!-- Announcement Board -->
+    <div class="section-title">📣 Announcements <a onclick="navigate('announcements')">All →</a></div>
+    <div class="announce-item"><div class="announce-title">End Semester Exam Schedule Released</div><div class="announce-body">Exams begin Mar 10. Hall tickets available in portal.</div><div class="announce-meta">Feb 18 · Admin</div></div>
+    <div class="announce-item" style="border-left-color:#d97706"><div class="announce-title">Fee Payment Reminder</div><div class="announce-body">Sem 6 fee due by Mar 31. Late fee applies after.</div><div class="announce-meta">Feb 17 · Accounts</div></div>
+    <div class="section-title" style="margin-top:4px">Today's Classes <a onclick="navigate('timetable')">Full →</a></div>
+    <div class="class-item"><div class="class-time">9:00 AM</div><div class="class-dot" style="background:#2563eb"></div><div class="class-info"><div class="class-name">Chemical Reaction Engg.</div><div class="class-code">CH6001</div><div class="class-meta">Dr. Sundar · Room 204</div></div><span class="class-badge bg-green c-green">Done</span></div>
+    <div class="class-item"><div class="class-time">10:30 AM</div><div class="class-dot" style="background:#7c3aed"></div><div class="class-info"><div class="class-name">Mass Transfer</div><div class="class-code">CH6002</div><div class="class-meta">Prof. Ramesh · Room 301</div></div><span class="class-badge bg-blue c-blue">Now</span></div>
+    <div class="class-item"><div class="class-time">2:00 PM</div><div class="class-dot" style="background:#059669"></div><div class="class-info"><div class="class-name">Process Control Lab</div><div class="class-code">CH6005L</div><div class="class-meta">Prof. Nair · Lab 3</div></div><span class="class-badge bg-orange c-orange">Later</span></div>
+  </div>
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="navigate('home')"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></button>
+    <button class="nav-item" onclick="navigate('attendance')"><span class="nav-icon">✅</span><span class="nav-label">Attend</span></button>
+    <button class="nav-center-btn" onclick="navigate('timetable')">📅</button>
+    <button class="nav-item" onclick="navigate('marks')"><span class="nav-icon">📊</span><span class="nav-label">Marks</span></button>
+    <button class="nav-item" onclick="openSidebar()"><span class="nav-icon">☰</span><span class="nav-label">Menu</span></button>
+  </div>
+</div>
+
+<!-- TIMETABLE -->
+<div id="screen-timetable" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Timetable</div><div style="font-size:11px;color:var(--text3)">25 cls/week</div></div>
+  <div class="scroll-content">
+    <div class="day-tabs">
+      <div class="day-chip" onclick="showDay(0,this)"><span class="d-day">Mon</span></div>
+      <div class="day-chip active" onclick="showDay(1,this)"><span class="d-day">Tue</span></div>
+      <div class="day-chip" onclick="showDay(2,this)"><span class="d-day">Wed</span></div>
+      <div class="day-chip" onclick="showDay(3,this)"><span class="d-day">Thu</span></div>
+      <div class="day-chip" onclick="showDay(4,this)"><span class="d-day">Fri</span></div>
+      <div class="day-chip" onclick="showDay(5,this)"><span class="d-day">Sat</span></div>
+    </div>
+    <div id="tt-content"></div>
+  </div>
+  <div class="bottom-nav"><button class="nav-item" onclick="navigate('home')"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></button><button class="nav-item" onclick="navigate('attendance')"><span class="nav-icon">✅</span><span class="nav-label">Attend</span></button><button class="nav-center-btn" onclick="navigate('timetable')">📅</button><button class="nav-item" onclick="navigate('marks')"><span class="nav-icon">📊</span><span class="nav-label">Marks</span></button><button class="nav-item" onclick="openSidebar()"><span class="nav-icon">☰</span><span class="nav-label">Menu</span></button></div>
+</div>
+
+<!-- ATTENDANCE -->
+<div id="screen-attendance" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Attendance</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="card" style="background:linear-gradient(135deg,#2563eb,#7c3aed);border:none;color:#fff;margin-bottom:13px">
+      <div style="font-size:11px;opacity:.75;font-weight:600;margin-bottom:5px">OVERALL · Section A · Reg: 12305182</div>
+      <div style="font-size:36px;font-weight:800">79%</div>
+      <div style="font-size:12px;opacity:.8">6 Subjects · 25 Classes/Week</div>
+    </div>
+    <div class="section-title">Tap subject for details</div>
+    <div class="att-subject" onclick="openAttDetail('Chemical Reaction Engg.','CH6001','2001',88,39,44,'9:00–10:00 AM')">
+      <div class="att-header"><div><div class="att-name">Chemical Reaction Engg.</div><div class="att-subcode">CH6001</div></div><div class="att-pct c-green">88%</div></div>
+      <div class="att-bar-bg"><div class="att-bar-fill" style="width:88%;background:#059669"></div></div>
+      <div class="att-foot"><span>39/44 · 9:00–10:00 AM</span><div class="att-foot-staff"><div>Dr. Sundar</div><div style="font-size:9px;color:var(--text3)">Staff #2001</div></div></div>
+    </div>
+    <div class="att-subject" onclick="openAttDetail('Mass Transfer','CH6002','2003',82,37,45,'10:30–11:30 AM')">
+      <div class="att-header"><div><div class="att-name">Mass Transfer</div><div class="att-subcode">CH6002</div></div><div class="att-pct c-green">82%</div></div>
+      <div class="att-bar-bg"><div class="att-bar-fill" style="width:82%;background:#059669"></div></div>
+      <div class="att-foot"><span>37/45 · 10:30–11:30 AM</span><div class="att-foot-staff"><div>Prof. Ramesh</div><div style="font-size:9px;color:var(--text3)">Staff #2003</div></div></div>
+    </div>
+    <div class="att-subject" onclick="openAttDetail('Heat Transfer','CH6004','2004',76,35,46,'11:30 AM–12:30 PM')">
+      <div class="att-header"><div><div class="att-name">Heat Transfer</div><div class="att-subcode">CH6004</div></div><div class="att-pct c-orange">76%</div></div>
+      <div class="att-bar-bg"><div class="att-bar-fill" style="width:76%;background:#d97706"></div></div>
+      <div class="att-foot"><span>35/46 · 11:30 AM–12:30 PM</span><div class="att-foot-staff"><div>Dr. Priya</div><div style="font-size:9px;color:var(--text3)">Staff #2004</div></div></div>
+    </div>
+    <div class="att-subject" onclick="openAttDetail('Process Control','CH6005','2005',68,30,44,'1:00–2:00 PM')">
+      <div class="att-header"><div><div class="att-name">Process Control</div><div class="att-subcode">CH6005</div></div><div class="att-pct c-red">68% ⚠️</div></div>
+      <div class="att-bar-bg"><div class="att-bar-fill" style="width:68%;background:#dc2626"></div></div>
+      <div class="att-foot"><span>30/44 · 1:00–2:00 PM</span><div class="att-foot-staff"><div>Prof. Krishnan</div><div style="font-size:9px;color:var(--text3)">Staff #2005</div></div></div>
+    </div>
+    <div class="att-subject" onclick="openAttDetail('Biochemical Engg.','CH6003','2006',85,38,45,'2:00–3:00 PM')">
+      <div class="att-header"><div><div class="att-name">Biochemical Engg.</div><div class="att-subcode">CH6003</div></div><div class="att-pct c-green">85%</div></div>
+      <div class="att-bar-bg"><div class="att-bar-fill" style="width:85%;background:#059669"></div></div>
+      <div class="att-foot"><span>38/45 · 2:00–3:00 PM</span><div class="att-foot-staff"><div>Prof. Anitha</div><div style="font-size:9px;color:var(--text3)">Staff #2006</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ATT DETAIL -->
+<div id="screen-att-detail" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('attendance')">← Back</button></div><div style="font-size:15px;font-weight:800" id="att-detail-title">Subject</div><div style="width:60px"></div></div>
+  <div class="scroll-content" id="att-detail-content"></div>
+</div>
+
+<!-- MARKS -->
+<div id="screen-marks" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Marks &amp; Results</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="stat-grid"><div class="stat-card"><div class="stat-label">SGPA</div><div class="stat-value c-blue">7.62</div><div class="stat-sub">Sem 6</div></div><div class="stat-card"><div class="stat-label">CGPA</div><div class="stat-value c-purple">7.58</div><div class="stat-sub">Overall</div></div></div>
+    <div class="section-title">Tap semester to expand</div>
+    <div class="sem-card" onclick="toggleSem(this)"><div class="sem-header"><div><div class="sem-title">Semester 6 — Current</div><div style="font-size:11px;color:var(--text2)">2025</div></div><div class="sem-sgpa c-blue">7.62 ▾</div></div><div class="sem-body open"><table class="marks-table"><tr><th>Code</th><th>Subject</th><th>Int./30</th><th>Mid/30</th><th>Grade</th></tr><tr><td class="c-blue">CH6001</td><td>Chem React. Engg.</td><td>26/30</td><td>24/30</td><td><span class="grade-badge bg-green c-green">A</span></td></tr><tr><td class="c-blue">CH6002</td><td>Mass Transfer</td><td>24/30</td><td>22/30</td><td><span class="grade-badge bg-blue c-blue">A</span></td></tr><tr><td class="c-blue">CH6004</td><td>Heat Transfer</td><td>22/30</td><td>20/30</td><td><span class="grade-badge bg-orange c-orange">B+</span></td></tr><tr><td class="c-blue">CH6005</td><td>Process Control</td><td>20/30</td><td>18/30</td><td><span class="grade-badge bg-orange c-orange">B</span></td></tr><tr><td class="c-blue">CH6003</td><td>Biochemical Engg.</td><td>24/30</td><td>22/30</td><td><span class="grade-badge bg-blue c-blue">A</span></td></tr></table></div></div>
+    <div class="sem-card" onclick="toggleSem(this)"><div class="sem-header"><div><div class="sem-title">Semester 5</div><div style="font-size:11px;color:var(--text2)">Nov 2024</div></div><div class="sem-sgpa c-green">7.80 ▾</div></div><div class="sem-body"><table class="marks-table"><tr><th>Code</th><th>Subject</th><th>Int./30</th><th>Mid/30</th><th>Grade</th></tr><tr><td class="c-blue">CH5001</td><td>ChE Thermodynamics</td><td>25/30</td><td>23/30</td><td><span class="grade-badge bg-blue c-blue">A</span></td></tr><tr><td class="c-blue">CH5002</td><td>Fluid Mechanics</td><td>26/30</td><td>24/30</td><td><span class="grade-badge bg-green c-green">A</span></td></tr><tr><td class="c-blue">CH5003</td><td>Particle Technology</td><td>22/30</td><td>20/30</td><td><span class="grade-badge bg-orange c-orange">B+</span></td></tr><tr><td class="c-blue">CH5004</td><td>Python Programming</td><td>28/30</td><td>26/30</td><td><span class="grade-badge bg-green c-green">A+</span></td></tr><tr><td class="c-blue">CH5005</td><td>Instrumentation</td><td>23/30</td><td>21/30</td><td><span class="grade-badge bg-orange c-orange">B+</span></td></tr></table></div></div>
+    <div class="sem-card" onclick="toggleSem(this)"><div class="sem-header"><div><div class="sem-title">Semester 4</div><div style="font-size:11px;color:var(--text2)">Apr 2024</div></div><div class="sem-sgpa c-green">7.70 ▾</div></div><div class="sem-body"><table class="marks-table"><tr><th>Code</th><th>Subject</th><th>Int./30</th><th>Mid/30</th><th>Grade</th></tr><tr><td class="c-blue">CH4001</td><td>C++ Programming</td><td>27/30</td><td>25/30</td><td><span class="grade-badge bg-green c-green">A+</span></td></tr><tr><td class="c-blue">CH4002</td><td>Material &amp; Energy Bal.</td><td>24/30</td><td>22/30</td><td><span class="grade-badge bg-blue c-blue">A</span></td></tr><tr><td class="c-blue">CH4003</td><td>Transport Phenomena</td><td>21/30</td><td>19/30</td><td><span class="grade-badge bg-orange c-orange">B+</span></td></tr><tr><td class="c-blue">CH4004</td><td>Organic Chemistry</td><td>24/30</td><td>22/30</td><td><span class="grade-badge bg-blue c-blue">A</span></td></tr><tr><td class="c-blue">MA4001</td><td>Engg. Maths IV</td><td>21/30</td><td>19/30</td><td><span class="grade-badge bg-orange c-orange">B</span></td></tr></table></div></div>
+    <div class="sem-card" onclick="toggleSem(this)"><div class="sem-header"><div><div class="sem-title">Semester 3</div><div style="font-size:11px;color:var(--text2)">Nov 2023</div></div><div class="sem-sgpa c-orange">7.50 ▾</div></div><div class="sem-body"><table class="marks-table"><tr><th>Code</th><th>Subject</th><th>Int./30</th><th>Mid/30</th><th>Grade</th></tr><tr><td class="c-blue">CH3001</td><td>Stoichiometry &amp; Thermo</td><td>22/30</td><td>20/30</td><td><span class="grade-badge bg-orange c-orange">B+</span></td></tr><tr><td class="c-blue">CH3002</td><td>Physical Chemistry</td><td>24/30</td><td>22/30</td><td><span class="grade-badge bg-blue c-blue">A</span></td></tr><tr><td class="c-blue">MA3001</td><td>Engg. Maths III</td><td>20/30</td><td>18/30</td><td><span class="grade-badge bg-orange c-orange">B</span></td></tr><tr><td class="c-blue">CS3001</td><td>Python &amp; Numerical Methods</td><td>26/30</td><td>24/30</td><td><span class="grade-badge bg-green c-green">A</span></td></tr><tr><td class="c-blue">CH3003</td><td>Chemical Process Calc.</td><td>22/30</td><td>20/30</td><td><span class="grade-badge bg-orange c-orange">B+</span></td></tr></table></div></div>
+    <div class="sem-card" onclick="toggleSem(this)"><div class="sem-header"><div><div class="sem-title">Semester 2</div><div style="font-size:11px;color:var(--text2)">Apr 2024</div></div><div class="sem-sgpa c-orange">7.40 ▾</div></div><div class="sem-body"><table class="marks-table"><tr><th>Code</th><th>Subject</th><th>Int./30</th><th>Mid/30</th><th>Grade</th></tr><tr><td class="c-blue">PH2001</td><td>Physics</td><td>22/30</td><td>20/30</td><td><span class="grade-badge bg-orange c-orange">B+</span></td></tr><tr><td class="c-blue">EC2001</td><td>Electronics &amp; Circuits</td><td>20/30</td><td>18/30</td><td><span class="grade-badge bg-orange c-orange">B</span></td></tr><tr><td class="c-blue">MA2001</td><td>Engg. Maths II</td><td>22/30</td><td>20/30</td><td><span class="grade-badge bg-orange c-orange">B+</span></td></tr><tr><td class="c-blue">CH2001</td><td>Basic Chemical Engg.</td><td>25/30</td><td>23/30</td><td><span class="grade-badge bg-blue c-blue">A</span></td></tr><tr><td class="c-blue">HS2001</td><td>Environmental Studies</td><td>26/30</td><td>24/30</td><td><span class="grade-badge bg-green c-green">A</span></td></tr></table></div></div>
+    <div class="sem-card" onclick="toggleSem(this)"><div class="sem-header"><div><div class="sem-title">Semester 1</div><div style="font-size:11px;color:var(--text2)">Nov 2023</div></div><div class="sem-sgpa c-orange">7.45 ▾</div></div><div class="sem-body"><table class="marks-table"><tr><th>Code</th><th>Subject</th><th>Int./30</th><th>Mid/30</th><th>Grade</th></tr><tr><td class="c-blue">MA1001</td><td>Engg. Maths I</td><td>22/30</td><td>20/30</td><td><span class="grade-badge bg-orange c-orange">B+</span></td></tr><tr><td class="c-blue">HS1001</td><td>Soft Skills I</td><td>27/30</td><td>25/30</td><td><span class="grade-badge bg-green c-green">A+</span></td></tr><tr><td class="c-blue">CH1001</td><td>Engg. Chemistry</td><td>24/30</td><td>22/30</td><td><span class="grade-badge bg-blue c-blue">A</span></td></tr><tr><td class="c-blue">PH1001</td><td>Engg. Physics</td><td>21/30</td><td>19/30</td><td><span class="grade-badge bg-orange c-orange">B+</span></td></tr><tr><td class="c-blue">ME1001</td><td>Workshop / Engg. Practices</td><td>25/30</td><td>23/30</td><td><span class="grade-badge bg-green c-green">A</span></td></tr></table></div></div>
+  </div>
+  <div class="bottom-nav"><button class="nav-item" onclick="navigate('home')"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></button><button class="nav-item" onclick="navigate('attendance')"><span class="nav-icon">✅</span><span class="nav-label">Attend</span></button><button class="nav-center-btn" onclick="navigate('timetable')">📅</button><button class="nav-item active"><span class="nav-icon">📊</span><span class="nav-label">Marks</span></button><button class="nav-item" onclick="openSidebar()"><span class="nav-icon">☰</span><span class="nav-label">Menu</span></button></div>
+</div>
+
+<!-- ASSIGNMENTS -->
+<div id="screen-assignments" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Assignments</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="section-title">Pending (3)</div>
+    <div class="assign-item"><div class="assign-header"><div><div class="assign-title">CSTR Design Problem</div><div class="assign-subject">CH6001 · Chemical Reaction Engg. · Dr. Sundar</div></div><div style="font-size:12px;font-weight:700;color:#dc2626">Feb 20</div></div><div style="font-size:12px;color:var(--text2);margin-bottom:9px">Design a CSTR for a second-order reaction and calculate conversion.</div><div style="display:flex;gap:8px"><a href="data:text/plain,CRE CSTR Assignment" download="CRE_Assignment.txt" style="text-decoration:none"><button class="btn-sm btn-outline">📥 Download</button></a><button class="btn-sm btn-fill" onclick="document.getElementById('up1').click()">📤 Upload</button><input type="file" id="up1" style="display:none" onchange="fileUploaded(this,'st1')"></div><div id="st1" style="font-size:12px;color:#059669;margin-top:6px;display:none"></div></div>
+    <div class="assign-item"><div class="assign-header"><div><div class="assign-title">Absorption Column Design</div><div class="assign-subject">CH6002 · Mass Transfer · Prof. Ramesh</div></div><div style="font-size:12px;font-weight:700;color:#d97706">Feb 22</div></div><div style="font-size:12px;color:var(--text2);margin-bottom:9px">Design a packed absorption column and determine NTU/HTU.</div><div style="display:flex;gap:8px"><a href="data:text/plain,Mass Transfer Assignment" download="MT_Assignment.txt" style="text-decoration:none"><button class="btn-sm btn-outline">📥 Download</button></a><button class="btn-sm btn-fill" onclick="document.getElementById('up2').click()">📤 Upload</button><input type="file" id="up2" style="display:none" onchange="fileUploaded(this,'st2')"></div><div id="st2" style="font-size:12px;color:#059669;margin-top:6px;display:none"></div></div>
+    <div class="assign-item"><div class="assign-header"><div><div class="assign-title">PID Controller Tuning</div><div class="assign-subject">CH6005 · Process Control · Prof. Krishnan</div></div><div style="font-size:12px;font-weight:700;color:#d97706">Feb 25</div></div><div style="font-size:12px;color:var(--text2);margin-bottom:9px">Tune a PID controller using Ziegler-Nichols method and simulate response.</div><div style="display:flex;gap:8px"><a href="data:text/plain,Process Control Assignment" download="PC_Assignment.txt" style="text-decoration:none"><button class="btn-sm btn-outline">📥 Download</button></a><button class="btn-sm btn-fill" onclick="document.getElementById('up3').click()">📤 Upload</button><input type="file" id="up3" style="display:none" onchange="fileUploaded(this,'st3')"></div><div id="st3" style="font-size:12px;color:#059669;margin-top:6px;display:none"></div></div>
+    <div class="section-title" style="margin-top:4px">Submitted</div>
+    <div class="assign-item" style="opacity:.6"><div class="assign-header"><div><div class="assign-title">Heat Exchanger Simulation</div><div class="assign-subject">CH6004 · Heat Transfer · Dr. Priya</div></div><span class="class-badge bg-green c-green">✅ Done</span></div></div>
+    <div class="assign-item" style="opacity:.6"><div class="assign-header"><div><div class="assign-title">Enzyme Kinetics Report</div><div class="assign-subject">CH6003 · Biochemical Engg. · Prof. Anitha</div></div><span class="grade-badge bg-green c-green">✅ Done</span></div></div>
+  </div>
+</div>
+
+<!-- EXAMS -->
+<div id="screen-exams" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Exam Schedule</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="card" style="background:linear-gradient(135deg,#dc2626,#f97316);border:none;color:#fff;margin-bottom:13px">
+      <div style="font-size:11px;opacity:.75;font-weight:600;margin-bottom:5px">SEM 6 END SEMESTER EXAMS</div>
+      <div style="font-size:20px;font-weight:800;margin-bottom:2px">Starts Mar 10, 2025</div>
+      <div style="font-size:12px;opacity:.8">Hall Ticket available in portal</div>
+    </div>
+    <div class="section-title">Schedule</div>
+    <div class="exam-item"><div class="exam-code">CH6001</div><div class="exam-name">Chemical Reaction Engineering</div><div class="exam-grid"><div class="exam-detail"><div class="exam-detail-label">Date</div><div class="exam-detail-val">Mar 10, Mon</div></div><div class="exam-detail"><div class="exam-detail-label">Time</div><div class="exam-detail-val">9:00 – 12:00</div></div><div class="exam-detail"><div class="exam-detail-label">Room No.</div><div class="exam-detail-val">Block A — 201</div></div><div class="exam-detail"><div class="exam-detail-label">Marks</div><div class="exam-detail-val">100</div></div></div></div>
+    <div class="exam-item"><div class="exam-code">CH6002</div><div class="exam-name">Mass Transfer</div><div class="exam-grid"><div class="exam-detail"><div class="exam-detail-label">Date</div><div class="exam-detail-val">Mar 12, Wed</div></div><div class="exam-detail"><div class="exam-detail-label">Time</div><div class="exam-detail-val">9:00 – 12:00</div></div><div class="exam-detail"><div class="exam-detail-label">Room No.</div><div class="exam-detail-val">Block B — 105</div></div><div class="exam-detail"><div class="exam-detail-label">Marks</div><div class="exam-detail-val">100</div></div></div></div>
+    <div class="exam-item"><div class="exam-code">CH6003</div><div class="exam-name">Biochemical Engineering</div><div class="exam-grid"><div class="exam-detail"><div class="exam-detail-label">Date</div><div class="exam-detail-val">Mar 14, Fri</div></div><div class="exam-detail"><div class="exam-detail-label">Time</div><div class="exam-detail-val">2:00 – 5:00</div></div><div class="exam-detail"><div class="exam-detail-label">Room No.</div><div class="exam-detail-val">Block A — 301</div></div><div class="exam-detail"><div class="exam-detail-label">Marks</div><div class="exam-detail-val">100</div></div></div></div>
+    <div class="exam-item"><div class="exam-code">CH6004</div><div class="exam-name">Heat Transfer</div><div class="exam-grid"><div class="exam-detail"><div class="exam-detail-label">Date</div><div class="exam-detail-val">Mar 17, Mon</div></div><div class="exam-detail"><div class="exam-detail-label">Time</div><div class="exam-detail-val">9:00 – 12:00</div></div><div class="exam-detail"><div class="exam-detail-label">Room No.</div><div class="exam-detail-val">Block C — 202</div></div><div class="exam-detail"><div class="exam-detail-label">Marks</div><div class="exam-detail-val">100</div></div></div></div>
+    <div class="exam-item"><div class="exam-code">CH6005</div><div class="exam-name">Process Control</div><div class="exam-grid"><div class="exam-detail"><div class="exam-detail-label">Date</div><div class="exam-detail-val">Mar 19, Wed</div></div><div class="exam-detail"><div class="exam-detail-label">Time</div><div class="exam-detail-val">2:00 – 5:00</div></div><div class="exam-detail"><div class="exam-detail-label">Room No.</div><div class="exam-detail-val">Block B — 204</div></div><div class="exam-detail"><div class="exam-detail-label">Marks</div><div class="exam-detail-val">100</div></div></div></div>
+  </div>
+</div>
+
+<!-- FEEDBACK -->
+<div id="screen-feedback" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Subject Feedback</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="card" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);border:none;color:#fff;margin-bottom:13px"><div style="font-size:13px;opacity:.8;margin-bottom:4px">Your feedback helps improve teaching quality</div><div style="font-size:11px;opacity:.65">Sem 6 · Anonymous · ChE</div></div>
+    <div id="feedback-container"></div>
+    <button class="btn-primary" onclick="submitFeedback()" type="button">Submit All Feedback</button>
+  </div>
+</div>
+
+<!-- EVENTS -->
+<div id="screen-events" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Campus Events</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="event-card"><div class="event-banner" style="background:linear-gradient(135deg,#1e3a8a,#3b82f6)">⚗️</div><div class="event-body"><div class="event-title">ChemE Symposium 2025</div><div class="event-meta"><span>📅 Feb 28–Mar 1</span><span>📍 Main Auditorium</span></div><button class="btn-event" onclick="openEventModal('ChemE Symposium 2025')">Register Now</button></div></div>
+    <div class="event-card"><div class="event-banner" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)">🎭</div><div class="event-body"><div class="event-title">Cultural Fest — Kalakriti 2025</div><div class="event-meta"><span>📅 Mar 8–10</span><span>📍 Open Air Theatre</span></div><button class="btn-event" onclick="openEventModal('Cultural Fest')">Register Now</button></div></div>
+    <div class="event-card"><div class="event-banner" style="background:linear-gradient(135deg,#059669,#34d399)">🏭</div><div class="event-body"><div class="event-title">Process Simulation Workshop</div><div class="event-meta"><span>📅 Mar 15</span><span>📍 Lab Complex B</span></div><button class="btn-event" onclick="openEventModal('Process Simulation Workshop')">Register Now</button></div></div>
+    <div class="event-card"><div class="event-banner" style="background:linear-gradient(135deg,#d97706,#fbbf24)">🏆</div><div class="event-body"><div class="event-title">Sports Day — Annual Meet</div><div class="event-meta"><span>📅 Mar 22</span><span>📍 Sports Ground</span></div><button class="btn-event" onclick="openEventModal('Sports Day')">Register Now</button></div></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="event-modal">
+  <div class="modal"><div class="modal-handle"></div><div class="modal-title" id="ev-modal-title">Event Registration</div>
+    <div class="input-group"><label>Full Name</label><input id="ev-name" type="text" value="Raja M"></div>
+    <div class="input-group"><label>Register Number</label><input id="ev-reg" type="text" value="12305182"></div>
+    <div class="input-group"><label>Email</label><input id="ev-email" type="email" value="royalraja1358@gmail.com"></div>
+    <div class="input-group"><label>Phone Number</label><input id="ev-phone" type="tel" value="8838909272"></div>
+    <div class="input-group"><label>Department</label><input id="ev-dept" type="text" value="Chemical Engineering"></div>
+    <button class="btn-primary" onclick="submitEvent()" type="button">✅ Confirm Registration</button>
+    <button onclick="closeModal('event-modal')" style="width:100%;padding:12px;border-radius:12px;background:transparent;border:2px solid var(--border);font-family:inherit;font-size:14px;font-weight:600;color:var(--text2);margin-top:8px;cursor:pointer;">Cancel</button>
+  </div>
+</div>
+
+<!-- MESSAGES -->
+<div id="screen-messages" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Messages</div><div class="icon-btn" onclick="openNewChatModal()">✏️</div></div>
+  <div class="scroll-content">
+    <div style="margin-bottom:11px"><input style="width:100%;padding:10px 13px;border-radius:11px;border:2px solid var(--border);background:var(--bg);font-family:inherit;font-size:13px;outline:none" placeholder="🔍  Search..."></div>
+    <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px">Groups</div>
+    <div class="msg-item" onclick="openChat('ChE-6A Group','👥')"><div class="msg-avatar bg-purple">👥</div><div class="msg-body"><div class="msg-name">ChE-6A Group</div><div class="msg-preview">Karthik: Anyone done the CRE assignment?</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><div class="msg-time">9:15</div><div class="msg-unread"></div></div></div>
+    <div class="msg-item" onclick="openChat('ChE Department','🏫')"><div class="msg-avatar bg-blue">🏫</div><div class="msg-body"><div class="msg-name">Chemical Engg. Dept.</div><div class="msg-preview">Holiday on Feb 25 announced</div></div><div><div class="msg-time">Mon</div></div></div>
+    <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin:10px 0 7px">Faculty</div>
+    <div class="msg-item" onclick="openChat('Dr. Sundar','👨‍🏫')"><div class="msg-avatar bg-blue">👨‍🏫</div><div class="msg-body"><div class="msg-name">Dr. Sundar</div><div class="msg-preview">CRE assignment deadline extended to Feb 25.</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><div class="msg-time">10:30</div><div class="msg-unread"></div></div></div>
+    <div class="msg-item" onclick="openChat('Prof. Ramesh','👨‍🏫')"><div class="msg-avatar bg-green">👨‍🏫</div><div class="msg-body"><div class="msg-name">Prof. Ramesh</div><div class="msg-preview">Good work! MT mid-term: 20/25</div></div><div><div class="msg-time">Yesterday</div></div></div>
+    <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin:10px 0 7px">Students</div>
+    <div class="msg-item" onclick="openChat('Priya Nair','🧑')"><div class="msg-avatar bg-red">🧑</div><div class="msg-body"><div class="msg-name">Priya Nair</div><div class="msg-preview">Can you share the CRE notes?</div></div><div><div class="msg-time">Sun</div></div></div>
+    <div class="msg-item" onclick="openChat('Rahul Gupta','🧑‍💻')"><div class="msg-avatar bg-green">🧑‍💻</div><div class="msg-body"><div class="msg-name">Rahul Gupta</div><div class="msg-preview">Symposium team? Let's register!</div></div><div><div class="msg-time">Sat</div></div></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="newchat-modal">
+  <div class="modal"><div class="modal-handle"></div><div class="modal-title">New Message</div>
+    <div class="input-group"><label>Search person</label><input type="text" placeholder="Name or roll number..."></div>
+    <div class="msg-item" onclick="openChat('Dr. Venkatesh','🎓');closeModal('newchat-modal')"><div class="msg-avatar bg-purple">🎓</div><div class="msg-body"><div class="msg-name">Dr. Venkatesh (HOD)</div><div class="msg-preview">Head of Chemical Engineering</div></div></div>
+    <div class="msg-item" onclick="openChat('Prof. Anitha','👩‍🏫');closeModal('newchat-modal')"><div class="msg-avatar bg-blue">👩‍🏫</div><div class="msg-body"><div class="msg-name">Prof. Anitha</div><div class="msg-preview">Biochemical Engg. Faculty</div></div></div>
+    <div class="msg-item" onclick="openChat('Sneha Raj','🧑');closeModal('newchat-modal')"><div class="msg-avatar bg-green">🧑</div><div class="msg-body"><div class="msg-name">Sneha Raj</div><div class="msg-preview">12305248 · ChE-6A</div></div></div>
+    <button onclick="closeModal('newchat-modal')" style="width:100%;padding:12px;border-radius:12px;background:transparent;border:2px solid var(--border);font-family:inherit;font-size:14px;font-weight:600;color:var(--text2);margin-top:12px;cursor:pointer;">Cancel</button>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div id="screen-chat" class="screen">
+  <div class="chat-header"><button class="back-btn" onclick="navigate('messages')">← Back</button><div style="width:34px;height:34px;border-radius:11px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:17px;" id="chat-avatar">👥</div><div style="flex:1;margin-left:9px"><div style="font-size:14px;font-weight:700" id="chat-name">Chat</div><div style="font-size:10px;color:var(--text3)">Online</div></div></div>
+  <div class="chat-messages" id="chat-msgs"></div>
+  <div class="chat-input-bar"><input class="chat-input" id="chat-in" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()"><button class="chat-send" onclick="sendMsg()">➤</button></div>
+</div>
+
+<!-- PERFORMANCE -->
+<div id="screen-performance" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Performance</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="card" style="background:linear-gradient(135deg,#059669,#0891b2);border:none;color:#fff;margin-bottom:13px"><div style="font-size:11px;opacity:.75;font-weight:600;margin-bottom:10px">OVERALL · Rank 18 of 60</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center"><div><div style="font-size:22px;font-weight:800">7.58</div><div style="font-size:10px;opacity:.75">CGPA</div></div><div><div style="font-size:22px;font-weight:800">79%</div><div style="font-size:10px;opacity:.75">Attend.</div></div><div><div style="font-size:22px;font-weight:800">Top 30%</div><div style="font-size:10px;opacity:.75">Class</div></div></div></div>
+    <!-- Attendance Risk Alert in Performance -->
+    <div class="risk-banner">
+      <div class="risk-title">⚠️ Attendance Risk Alert</div>
+      <div class="risk-item">• CH6005 Process Control: 68% — Need 5 more classes to reach 75%</div>
+      <div class="risk-item">• CH6004 Heat Transfer: 76% — Borderline, avoid absence</div>
+    </div>
+    <!-- AI Suggestions -->
+    <div class="section-title">🤖 AI Improvement Suggestions</div>
+    <div class="ai-suggestion"><div class="ai-badge">AI INSIGHT</div><div class="ai-text"><strong>Process Control (CH6005):</strong> Your mid-term score of 18/30 suggests difficulty with control system design. Focus on PID tuning chapters 4–6 and attempt past papers from 2022–2024.</div></div>
+    <div class="ai-suggestion"><div class="ai-badge">AI INSIGHT</div><div class="ai-text"><strong>Attendance:</strong> You've missed 14 classes across all subjects. Attending all remaining 18 lectures can push your CGPA above 7.80 based on trend analysis.</div></div>
+    <div class="ai-suggestion"><div class="ai-badge">AI INSIGHT</div><div class="ai-text"><strong>Strength — Python/C++:</strong> Your programming scores are among the top 10% of your batch. Consider applying for the process simulation elective next sem.</div></div>
+    <div class="section-title">SGPA Trend</div>
+    <div class="graph-container"><div class="graph-bars" id="sgpa-graph"></div><div style="height:1px;background:var(--border);margin:6px 0"></div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text2)"><span>S1: 7.45</span><span>S2: 7.40</span><span>S3: 7.50</span><span>S4: 7.70</span><span>S5: 7.80</span><span>S6: 7.62</span></div></div>
+    <div class="section-title">All Subjects — Sem 6</div>
+    <div class="card" style="padding:0;overflow:hidden"><table class="marks-table"><tr><th>Code</th><th>Subject</th><th>Attend</th><th>Grade</th></tr><tr><td class="c-blue">CH6001</td><td>Chem React. Engg.</td><td class="c-green">88%</td><td><span class="grade-badge bg-green c-green">A</span></td></tr><tr><td class="c-blue">CH6002</td><td>Mass Transfer</td><td class="c-green">82%</td><td><span class="grade-badge bg-blue c-blue">A</span></td></tr><tr><td class="c-blue">CH6004</td><td>Heat Transfer</td><td class="c-orange">76%</td><td><span class="grade-badge bg-orange c-orange">B+</span></td></tr><tr><td class="c-blue">CH6005</td><td>Process Control</td><td class="c-red">68%</td><td><span class="grade-badge bg-orange c-orange">B</span></td></tr><tr><td class="c-blue">CH6003</td><td>Biochemical Engg.</td><td class="c-green">85%</td><td><span class="grade-badge bg-blue c-blue">A</span></td></tr></table></div>
+  </div>
+</div>
+
+<!-- LEAVE -->
+<div id="screen-leave" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Leave Application</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="card"><div style="font-size:15px;font-weight:800;margin-bottom:13px">Apply for Leave</div><div class="input-group"><label>Leave Type</label><select><option>Medical Leave</option><option>Personal Leave</option><option>Emergency Leave</option><option>Study Leave</option></select></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="input-group"><label>From Date</label><input type="date" value="2025-02-20"></div><div class="input-group"><label>To Date</label><input type="date" value="2025-02-21"></div></div><div class="input-group"><label>Reason</label><textarea>Attending a family medical appointment.</textarea></div><button class="btn-primary" onclick="showToast('Leave submitted! 📝')" type="button">Submit Application</button></div>
+    <div class="section-title" style="margin-top:4px">Leave History</div>
+    <div class="leave-item"><div><div class="leave-type">Medical Leave</div><div class="leave-dates">Jan 15–16 · 2 days</div></div><span class="leave-status bg-green c-green">Approved</span></div>
+    <div class="leave-item"><div><div class="leave-type">Personal Leave</div><div class="leave-dates">Dec 10 · 1 day</div></div><span class="leave-status bg-green c-green">Approved</span></div>
+    <div class="leave-item"><div><div class="leave-type">Emergency Leave</div><div class="leave-dates">Nov 5–6 · 2 days</div></div><span class="leave-status bg-orange c-orange">Pending</span></div>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS -->
+<div id="screen-notifications" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Notifications</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="section-title">New (3)</div>
+    <div class="notif-item"><div class="notif-icon bg-blue">📁</div><div style="flex:1"><div class="notif-title">Assignment Deadline Extended</div><div class="notif-desc">Dr. Sundar extended CRE (CH6001) deadline to Feb 25.</div><div class="notif-time">10:30 AM · Today</div></div><div class="notif-dot"></div></div>
+    <div class="notif-item"><div class="notif-icon bg-orange">⚠️</div><div style="flex:1"><div class="notif-title">Low Attendance Warning</div><div class="notif-desc">CH6005 Process Control at 68% — below required 75%.</div><div class="notif-time">9:00 AM · Today</div></div><div class="notif-dot"></div></div>
+    <div class="notif-item"><div class="notif-icon bg-green">🎉</div><div style="flex:1"><div class="notif-title">ChemE Symposium Registration Open</div><div class="notif-desc">ChemE Symposium 2025 registrations are now open!</div><div class="notif-time">8:00 AM · Today</div></div><div class="notif-dot"></div></div>
+    <div class="section-title" style="margin-top:4px">Earlier</div>
+    <div class="notif-item" style="opacity:.7"><div class="notif-icon bg-purple">📊</div><div style="flex:1"><div class="notif-title">Mid-Sem Results Published</div><div class="notif-desc">Sem 6 mid-semester marks available.</div><div class="notif-time">Yesterday · 3 PM</div></div></div>
+    <div class="notif-item" style="opacity:.7"><div class="notif-icon bg-green">✅</div><div style="flex:1"><div class="notif-title">Leave Approved</div><div class="notif-desc">Medical leave Jan 15-16 approved.</div><div class="notif-time">Jan 14 · 11 AM</div></div></div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div id="screen-profile" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Profile</div><div style="width:36px"></div></div>
+  <div class="scroll-content">
+    <div class="profile-hero">
+      <div class="profile-avatar-lg"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Raja&backgroundColor=b6e3f4" alt="Raja M"></div>
+      <div class="profile-name">Raja M</div>
+      <div class="profile-regno">12305182</div>
+      <div class="profile-role">B.Tech Chemical Engineering</div>
+    </div>
+    <div class="section-title">Personal Details</div>
+    <div class="card">
+      <div class="profile-item"><div class="profile-icon bg-blue">🎓</div><div style="flex:1"><div class="profile-item-label">Reg. Number</div><div class="profile-item-value">12305182</div></div></div>
+      <div class="profile-item"><div class="profile-icon bg-green">📧</div><div style="flex:1"><div class="profile-item-label">Email</div><div class="profile-item-value">royalraja1358@gmail.com</div></div></div>
+      <div class="profile-item"><div class="profile-icon bg-orange">📱</div><div style="flex:1"><div class="profile-item-label">Phone</div><div class="profile-item-value">8838909272</div></div></div>
+      <div class="profile-item"><div class="profile-icon bg-purple">🎂</div><div style="flex:1"><div class="profile-item-label">Date of Birth</div><div class="profile-item-value">06 August 2005</div></div></div>
+      <div class="profile-item"><div class="profile-icon bg-blue">👤</div><div style="flex:1"><div class="profile-item-label">Gender</div><div class="profile-item-value">Male</div></div></div>
+      <div class="profile-item"><div class="profile-icon bg-orange">👨‍👦</div><div style="flex:1"><div class="profile-item-label">Father's Name</div><div class="profile-item-value">Murugesan</div></div></div>
+      <div class="profile-item"><div class="profile-icon bg-red">📅</div><div style="flex:1"><div class="profile-item-label">Batch</div><div class="profile-item-value">2023–27</div></div></div>
+      <div class="profile-item"><div class="profile-icon bg-green">📍</div><div style="flex:1"><div class="profile-item-label">Address</div><div class="profile-item-value">Door No. 14, 2nd Cross St., Chennai, India</div></div></div>
+    </div>
+    <div class="section-title">Academic Details</div>
+    <div class="card">
+      <div class="profile-item"><div class="profile-icon bg-blue">🏫</div><div style="flex:1"><div class="profile-item-label">Program</div><div class="profile-item-value">B.Tech Chemical Engineering</div></div></div>
+      <div class="profile-item"><div class="profile-icon bg-purple">📅</div><div style="flex:1"><div class="profile-item-label">Academic Session</div><div class="profile-item-value">2023 – Present</div></div></div>
+      <div class="profile-item"><div class="profile-icon bg-green">🏷️</div><div style="flex:1"><div class="profile-item-label">Section</div><div class="profile-item-value">ChE-6A</div></div></div>
+      <div class="profile-item"><div class="profile-icon bg-orange">👨‍🏫</div><div style="flex:1"><div class="profile-item-label">Head of Department</div><div class="profile-item-value">Dr. Venkatesh</div></div></div>
+      <div class="profile-item"><div class="profile-icon bg-red">🏠</div><div style="flex:1"><div class="profile-item-label">Hostel</div><div class="profile-item-value">Block C, Room 214</div></div></div>
+    </div>
+    <div class="stat-grid" style="margin-top:10px">
+      <div class="stat-card"><div class="stat-label">CGPA</div><div class="stat-value c-blue">7.58</div></div>
+      <div class="stat-card"><div class="stat-label">Attendance</div><div class="stat-value c-green">79%</div></div>
+    </div>
+    <button class="btn-primary" style="background:#dc2626;margin-top:4px" onclick="doLogout()" type="button">🚪 Sign Out</button>
+  </div>
+  <div class="bottom-nav"><button class="nav-item" onclick="navigate('home')"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></button><button class="nav-item" onclick="navigate('attendance')"><span class="nav-icon">✅</span><span class="nav-label">Attend</span></button><button class="nav-center-btn" onclick="navigate('timetable')">📅</button><button class="nav-item" onclick="navigate('marks')"><span class="nav-icon">📊</span><span class="nav-label">Marks</span></button><button class="nav-item active" onclick="openSidebar()"><span class="nav-icon">☰</span><span class="nav-label">Menu</span></button></div>
+</div>
+
+<!-- ANNOUNCEMENTS -->
+<div id="screen-announcements" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Announcement Board</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="section-title">📣 Official Notices</div>
+    <div class="announce-item"><div class="announce-title">End Semester Exam Schedule Released</div><div class="announce-body">Sem 6 end semester exams begin March 10. Hall tickets can be downloaded from the student portal from Feb 28.</div><div class="announce-meta">📅 Feb 18 · Admin Office</div></div>
+    <div class="announce-item" style="border-left-color:#d97706"><div class="announce-title">Fee Payment — Last Date Mar 31</div><div class="announce-body">Semester 6 tuition and hostel fee must be paid before March 31, 2025. A late fee of ₹500/day applies after the deadline.</div><div class="announce-meta">📅 Feb 17 · Accounts Dept.</div></div>
+    <div class="announce-item" style="border-left-color:#059669"><div class="announce-title">ChemE Industrial Visit — ALREADY CONFIRMED</div><div class="announce-body">Industrial visit to CPCL Refinery, Chennai on Mar 5. Permission slips must be submitted by Feb 22.</div><div class="announce-meta">📅 Feb 15 · Dept. Office</div></div>
+    <div class="announce-item" style="border-left-color:#7c3aed"><div class="announce-title">Anti-Ragging Committee Meeting</div><div class="announce-body">All students are reminded of zero tolerance policy. Report any incident to Student Welfare Officer.</div><div class="announce-meta">📅 Feb 12 · Dean Office</div></div>
+    <div class="announce-item"><div class="announce-title">Library Books — Return Reminder</div><div class="announce-body">All borrowed books must be returned before exams. Fine ₹2/day per book after due date.</div><div class="announce-meta">📅 Feb 10 · Library</div></div>
+  </div>
+</div>
+
+<!-- TEACHER ON LEAVE -->
+<div id="screen-teacher-leave" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Teachers on Leave</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="card" style="background:linear-gradient(135deg,#d97706,#f59e0b);border:none;color:#fff;margin-bottom:13px">
+      <div style="font-size:13px;opacity:.8;margin-bottom:4px">Today — Feb 18, 2025</div>
+      <div style="font-size:22px;font-weight:800">2 Staff on Leave</div>
+      <div style="font-size:12px;opacity:.75">Classes may be rescheduled</div>
+    </div>
+    <div class="section-title">Today's Absences</div>
+    <div class="teacher-item" onclick="showToast('Dr. Priya · Staff #2004 · CH6004 Heat Transfer')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div class="teacher-name">Dr. Priya</div><div class="teacher-id">Staff ID: #2004 · CH6004 Heat Transfer</div></div>
+        <span class="leave-status bg-orange c-orange">On Leave</span>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text2)">11:30 AM–12:30 PM class cancelled. Substitute: Prof. Nair</div>
+    </div>
+    <div class="teacher-item" onclick="showToast('Prof. Anitha · Staff #2006 · CH6003 Biochemical Engg.')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div class="teacher-name">Prof. Anitha</div><div class="teacher-id">Staff ID: #2006 · CH6003 Biochemical Engg.</div></div>
+        <span class="leave-status bg-orange c-orange">On Leave</span>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text2)">2:00–3:00 PM class rescheduled to Thursday</div>
+    </div>
+    <div class="section-title" style="margin-top:4px">This Week</div>
+    <div class="teacher-item" onclick="showToast('Prof. Krishnan · Staff #2005 · CH6005 Process Control')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div class="teacher-name">Prof. Krishnan</div><div class="teacher-id">Staff ID: #2005 · CH6005 Process Control</div></div>
+        <span class="leave-status bg-green c-green">Feb 20</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEE DETAILS -->
+<div id="screen-fee-details" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Fee Details</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="card" style="background:linear-gradient(135deg,#059669,#0891b2);border:none;color:#fff;margin-bottom:13px">
+      <div style="font-size:11px;opacity:.75;font-weight:600;margin-bottom:5px">SEM 6 · 2024–25 · DUE DATE: MAR 31</div>
+      <div style="font-size:32px;font-weight:800">₹72,500</div>
+      <div style="font-size:12px;opacity:.8;margin-top:3px">Total Payable · ₹18,000 Pending</div>
+    </div>
+    <div class="section-title">Sem 6 Breakdown</div>
+    <div class="card">
+      <div class="fee-item"><div class="fee-name">Tuition Fee</div><div class="fee-amount c-green">₹45,000 ✅</div></div>
+      <div class="fee-item"><div class="fee-name">Lab Fee</div><div class="fee-amount c-green">₹5,000 ✅</div></div>
+      <div class="fee-item"><div class="fee-name">Hostel Fee</div><div class="fee-amount c-green">₹4,500 ✅</div></div>
+      <div class="fee-item"><div class="fee-name">Exam Fee</div><div class="fee-amount c-red">₹3,000 ⏳</div></div>
+      <div class="fee-item"><div class="fee-name">Library Fee</div><div class="fee-amount c-red">₹500 ⏳</div></div>
+      <div class="fee-item"><div class="fee-name">Other Charges</div><div class="fee-amount c-red">₹14,500 ⏳</div></div>
+    </div>
+    <div class="section-title">Payment History</div>
+    <div class="leave-item"><div><div class="leave-type">Tuition + Lab Fee</div><div class="leave-dates">Paid Jan 10 · Receipt #22541</div></div><span class="leave-status bg-green c-green">Paid</span></div>
+    <div class="leave-item"><div><div class="leave-type">Hostel Fee</div><div class="leave-dates">Paid Jan 12 · Receipt #22556</div></div><span class="leave-status bg-green c-green">Paid</span></div>
+    <div class="leave-item"><div><div class="leave-type">Exam + Library + Others</div><div class="leave-dates">Due Mar 31</div></div><span class="leave-status bg-orange c-orange">Pending</span></div>
+    <button class="btn-primary" onclick="showToast('Redirecting to payment gateway...')">💳 Pay Now — ₹18,000</button>
+  </div>
+</div>
+
+<!-- HOSTEL COMPLAINTS -->
+<div id="screen-hostel" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Hostel Complaints</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="card"><div style="font-size:15px;font-weight:800;margin-bottom:13px">Raise a Complaint</div>
+      <div class="input-group"><label>Category</label><select><option>Plumbing</option><option>Electrical</option><option>Cleanliness</option><option>Internet</option><option>Furniture</option><option>Other</option></select></div>
+      <div class="input-group"><label>Room Number</label><input type="text" value="C-214" placeholder="e.g. C-214"></div>
+      <div class="input-group"><label>Description</label><textarea placeholder="Describe the issue..."></textarea></div>
+      <button class="btn-primary" onclick="showToast('Complaint raised! Ticket #HC2025-089')">Submit Complaint</button>
+    </div>
+    <div class="section-title">My Complaints</div>
+    <div class="complaint-item"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:700">Internet Not Working</span><span class="leave-status bg-green c-green">Resolved</span></div><div style="font-size:11px;color:var(--text2)">Room C-214 · Raised Feb 10 · Ticket #HC2025-071</div></div>
+    <div class="complaint-item"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:700">Tap Leaking</span><span class="leave-status bg-orange c-orange">In Progress</span></div><div style="font-size:11px;color:var(--text2)">Room C-214 · Raised Feb 14 · Ticket #HC2025-082</div></div>
+  </div>
+</div>
+
+<!-- BUS TRACKING -->
+<div id="screen-bus-tracking" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Bus Tracking</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="card" style="background:linear-gradient(135deg,#059669,#0891b2);border:none;color:#fff;margin-bottom:13px">
+      <div style="font-size:12px;opacity:.8;margin-bottom:4px">Live GPS Tracking</div>
+      <div style="font-size:20px;font-weight:800">Your Route: Bus #12</div>
+      <div style="font-size:12px;opacity:.75">Tambaram → Campus · ETA 8 min</div>
+    </div>
+    <div class="section-title">All Routes</div>
+    <div class="bus-item"><div style="width:40px;height:40px;border-radius:12px;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🚌</div><div style="flex:1"><div style="font-size:13px;font-weight:700">Bus #12 — Tambaram</div><div style="font-size:11px;color:var(--text2)">Tambaram → Chrompet → GST Rd → Campus</div></div><span style="font-size:12px;font-weight:700;color:#059669">🟢 8 min</span></div>
+    <div class="bus-item"><div style="width:40px;height:40px;border-radius:12px;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🚌</div><div style="flex:1"><div style="font-size:13px;font-weight:700">Bus #7 — Velachery</div><div style="font-size:11px;color:var(--text2)">Velachery → Guindy → Porur → Campus</div></div><span style="font-size:12px;font-weight:700;color:#d97706">🟡 22 min</span></div>
+    <div class="bus-item"><div style="width:40px;height:40px;border-radius:12px;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🚌</div><div style="flex:1"><div style="font-size:13px;font-weight:700">Bus #3 — T.Nagar</div><div style="font-size:11px;color:var(--text2)">T.Nagar → Ashok Nagar → Campus</div></div><span style="font-size:12px;font-weight:700;color:#dc2626">🔴 35 min</span></div>
+  </div>
+</div>
+
+<!-- LIBRARY -->
+<div id="screen-library" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Library</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div style="margin-bottom:11px"><input style="width:100%;padding:10px 13px;border-radius:11px;border:2px solid var(--border);background:var(--bg);font-family:inherit;font-size:13px;outline:none" placeholder="🔍  Search books..."></div>
+    <div class="section-title">📚 My Borrowed Books</div>
+    <div class="book-item"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:13px;font-weight:700">Chemical Reaction Engineering</span><span class="leave-status bg-orange c-orange">Due Feb 25</span></div><div style="font-size:11px;color:var(--text2)">Octave Levenspiel · 3rd Ed · Acc# LB4521</div></div>
+    <div class="book-item"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:13px;font-weight:700">Transport Phenomena</span><span class="leave-status bg-green c-green">Due Mar 5</span></div><div style="font-size:11px;color:var(--text2)">Bird, Stewart, Lightfoot · Acc# LB3812</div></div>
+    <div class="section-title" style="margin-top:4px">Popular in ChE</div>
+    <div class="book-item"><div style="font-size:13px;font-weight:700;margin-bottom:3px">Mass Transfer Operations</div><div style="font-size:11px;color:var(--text2)">Treybal · Available: 2 copies</div><button class="btn-sm btn-fill" style="margin-top:8px" onclick="showToast('Request sent for Mass Transfer Operations')">Request</button></div>
+    <div class="book-item"><div style="font-size:13px;font-weight:700;margin-bottom:3px">Process Systems Analysis & Control</div><div style="font-size:11px;color:var(--text2)">Coughanowr · Available: 1 copy</div><button class="btn-sm btn-fill" style="margin-top:8px" onclick="showToast('Request sent!')">Request</button></div>
+  </div>
+</div>
+
+<!-- DIGITAL ID CARD -->
+<div id="screen-id-card" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Digital ID Card</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="id-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+        <div><div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;opacity:.7;margin-bottom:4px">Student Identity Card</div><div style="font-size:14px;font-weight:800">Sri Venkateswara College of Engg.</div></div>
+        <div style="font-size:28px">🏛️</div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:flex-start">
+        <div style="width:60px;height:60px;border-radius:12px;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);overflow:hidden;flex-shrink:0"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Raja&backgroundColor=b6e3f4" style="width:100%;height:100%;object-fit:cover"></div>
+        <div>
+          <div style="font-size:18px;font-weight:800;margin-bottom:2px">Raja M</div>
+          <div style="font-size:11px;opacity:.8;margin-bottom:2px">Reg. No: 12305182</div>
+          <div style="font-size:11px;opacity:.8;margin-bottom:2px">B.Tech Chemical Engineering</div>
+          <div style="font-size:11px;opacity:.7">Sem 6 · Section A · 2023–27</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.2);display:flex;justify-content:space-between;font-size:10px;opacity:.7">
+        <span>DOB: 06/08/2005</span><span>Blood: B+</span><span>Valid: 2027</span>
+      </div>
+    </div>
+    <div style="text-align:center;font-size:60px;letter-spacing:6px;margin:10px 0;padding:16px;background:#fff;border-radius:var(--radius);border:1px solid var(--border)">▮▮▮▯▮▯▮▮▮▯▮</div>
+    <div style="text-align:center;font-size:12px;color:var(--text3);margin-bottom:14px">Barcode ID: 12305182</div>
+    <button class="btn-primary" onclick="showToast('ID Card saved to gallery! 🪪')">📥 Download ID Card</button>
+  </div>
+</div>
+
+<!-- REMINDERS -->
+<div id="screen-reminders" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Reminders</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="card"><div style="font-size:15px;font-weight:800;margin-bottom:13px">Add Reminder</div>
+      <div class="input-group"><label>Type</label><select id="rem-type"><option>Assignment</option><option>Timetable</option><option>Exam</option><option>Fee Payment</option><option>Custom</option></select></div>
+      <div class="input-group"><label>Title</label><input id="rem-title" type="text" placeholder="e.g. Submit CRE assignment"></div>
+      <div class="input-group"><label>Date &amp; Time</label><input id="rem-dt" type="datetime-local"></div>
+      <button class="btn-primary" onclick="addReminder()" type="button">+ Add Reminder</button>
+    </div>
+    <div class="section-title">Active Reminders</div>
+    <div id="reminders-list">
+      <div class="reminder-item"><div><div class="reminder-text">Submit CRE Assignment</div><div class="reminder-time">Feb 20 · 9:00 AM · Assignment</div></div><button class="reminder-del" onclick="this.closest('.reminder-item').remove();showToast('Reminder deleted')">×</button></div>
+      <div class="reminder-item"><div><div class="reminder-text">CH6001 Exam Preparation</div><div class="reminder-time">Mar 8 · 8:00 AM · Exam</div></div><button class="reminder-del" onclick="this.closest('.reminder-item').remove();showToast('Reminder deleted')">×</button></div>
+      <div class="reminder-item"><div><div class="reminder-text">Fee Payment Deadline</div><div class="reminder-time">Mar 31 · 10:00 AM · Fee Payment</div></div><button class="reminder-del" onclick="this.closest('.reminder-item').remove();showToast('Reminder deleted')">×</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- CAMPUS MAP -->
+<div id="screen-campus-map" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Campus Map</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="map-area">
+      <div style="position:absolute;inset:0;background:linear-gradient(135deg,#dbeafe 0%,#e0f2fe 50%,#dcfce7 100%)"></div>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;font-weight:700;color:var(--text3)">CAMPUS GROUND</div>
+      <div class="map-room" style="top:15%;left:10%;background:#eff6ff" onclick="showToast('Block A — Classrooms 101–205')">Block A</div>
+      <div class="map-room" style="top:15%;right:10%;background:#f5f3ff" onclick="showToast('Block B — Labs & Faculty')">Block B</div>
+      <div class="map-room" style="top:45%;left:5%;background:#ecfdf5" onclick="showToast('Block C — Hostel')">Hostel C</div>
+      <div class="map-room" style="top:45%;right:5%;background:#fffbeb" onclick="showToast('Library — Open 8AM–8PM')">Library</div>
+      <div class="map-room" style="bottom:20%;left:30%;background:#fef2f2" onclick="showToast('Canteen — Open 7AM–9PM')">Canteen</div>
+      <div class="map-room" style="bottom:20%;right:20%;background:#eff6ff" onclick="showToast('Admin Block — Office hours 9–5')">Admin</div>
+      <div class="map-room" style="top:70%;left:45%;background:#dcfce7" onclick="showToast('Sports Ground — Open 5–7 PM')">Sports</div>
+    </div>
+    <div class="section-title">Key Locations</div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--border);cursor:pointer" onclick="showToast('Block A — ChE Classes: Rooms 201–205, 3rd Floor')"><span style="font-size:20px">🏫</span><div><div style="font-size:13px;font-weight:700">Block A — ChE Dept.</div><div style="font-size:11px;color:var(--text2)">Classrooms 201–205, 3rd Floor</div></div></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--border);cursor:pointer" onclick="showToast('Lab Complex B — ChE Labs: Lab 2, Lab 3, Lab 4')"><span style="font-size:20px">🧪</span><div><div style="font-size:13px;font-weight:700">Lab Complex B</div><div style="font-size:11px;color:var(--text2)">ChE Labs: Lab 2, Lab 3, Lab 4</div></div></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;cursor:pointer" onclick="showToast('Seminar Hall — Ground Floor, Admin Block')"><span style="font-size:20px">🎤</span><div><div style="font-size:13px;font-weight:700">Seminar Hall</div><div style="font-size:11px;color:var(--text2)">Ground Floor · Admin Block</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CANTEEN -->
+<div id="screen-canteen" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Canteen — Live Menu</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div class="welcome-banner" style="background:linear-gradient(135deg,#d97706,#f59e0b)">
+      <div style="font-size:11px;opacity:.8;font-weight:700;margin-bottom:3px">CAMPUS CANTEEN · 10 SHOPS</div>
+      <div style="font-size:16px;font-weight:800">Tap a shop to order 🍽️</div>
+    </div>
+    <div id="canteen-list"></div>
+  </div>
+</div>
+
+<!-- CANTEEN SHOP DETAIL -->
+<div id="screen-canteen-shop" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('canteen')">← Back</button></div><div style="font-size:15px;font-weight:800" id="shop-title">Shop</div><div style="width:60px"></div></div>
+  <div class="scroll-content" id="shop-content"></div>
+</div>
+
+<!-- LOST & FOUND -->
+<div id="screen-lost-found" class="screen">
+  <div class="app-header"><div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div><div style="font-size:16px;font-weight:800">Lost &amp; Found</div><div style="width:60px"></div></div>
+  <div class="scroll-content">
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="btn-sm btn-fill" style="flex:1" onclick="showToast('Report Lost Item form opened')">📢 Report Lost</button>
+      <button class="btn-sm btn-outline" style="flex:1" onclick="showToast('Report Found Item form opened')">✅ Report Found</button>
+    </div>
+    <div class="section-title">Recent Posts</div>
+    <div class="lost-item"><span class="lost-tag bg-red c-red">Lost</span><div style="font-size:13px;font-weight:700;margin-bottom:3px">Blue Water Bottle</div><div style="font-size:11px;color:var(--text2);margin-bottom:4px">Lost near Lab Complex B on Feb 16. Has name sticker.</div><div style="font-size:10px;color:var(--text3)">Posted by: 12305182 · Feb 16</div></div>
+    <div class="lost-item"><span class="lost-tag bg-green c-green">Found</span><div style="font-size:13px;font-weight:700;margin-bottom:3px">Calculator (Casio fx-991)</div><div style="font-size:11px;color:var(--text2);margin-bottom:4px">Found in Room 204, Block A. Contact warden to collect.</div><div style="font-size:10px;color:var(--text3)">Posted by: 12305205 · Feb 17</div></div>
+    <div class="lost-item"><span class="lost-tag bg-red c-red">Lost</span><div style="font-size:13px;font-weight:700;margin-bottom:3px">Student ID Card</div><div style="font-size:11px;color:var(--text2);margin-bottom:4px">Lost somewhere between Block A and Canteen. Please contact admin.</div><div style="font-size:10px;color:var(--text3)">Posted by: 12305119 · Feb 15</div></div>
+    <div class="lost-item"><span class="lost-tag bg-green c-green">Found</span><div style="font-size:13px;font-weight:700;margin-bottom:3px">Umbrella (Red)</div><div style="font-size:11px;color:var(--text2);margin-bottom:4px">Found outside Library. Handed to security desk.</div><div style="font-size:10px;color:var(--text3)">Posted by: 12305334 · Feb 14</div></div>
+  </div>
+</div>
+
+<!-- TOAST & END -->
+<div class="toast" id="toast"></div>
+</div><!-- end .phone -->
+
+<script>
+const screens=["login","home","timetable","attendance","att-detail","marks","assignments","exams","feedback","events","messages","chat","performance","leave","notifications","profile","announcements","teacher-leave","fee-details","hostel","bus-tracking","library","id-card","reminders","campus-map","canteen","canteen-shop","lost-found"];
+
+function navigate(n){
+  screens.forEach(s=>{const e=document.getElementById("screen-"+s);if(e){e.classList.remove("active");e.classList.remove("animating");}});
+  const t=document.getElementById("screen-"+n);
+  if(t){t.classList.add("active");void t.offsetWidth;t.classList.add("animating");setTimeout(()=>{if(t)t.classList.remove("animating");},250);}
+  document.querySelectorAll(".bottom-nav").forEach(nav=>{
+    nav.querySelectorAll(".nav-item").forEach(item=>{
+      const oc=item.getAttribute("onclick");
+      if(oc){const m=oc.match(/navigate\('([^']+)'\)/);if(m)item.classList.toggle("active",m[1]===n);}
+    });
+  });
+  if(n==="performance")setTimeout(drawGraph,50);
+  if(n==="timetable"){setTimeout(()=>{const chips=document.querySelectorAll(".day-chip");if(chips[1])showDay(1,chips[1]);},50);}
+  if(n==="feedback")setTimeout(renderFeedback,50);
+  if(n==="canteen")renderCanteen();
+}
+
+function openSidebar(){document.getElementById("sidebar").classList.add("open");document.getElementById("sidebarOverlay").classList.add("open");}
+function closeSidebar(){document.getElementById("sidebar").classList.remove("open");document.getElementById("sidebarOverlay").classList.remove("open");}
+
+function doLogin(){navigate("home");}
+function doLogout(){navigate("login");closeSidebar();}
+function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2500);}
+
+function showForgotPassword(){
+  const email=prompt("Enter your registered email or roll number:");
+  if(email)showToast("Password reset link sent to "+email+" 📧");
+}
+
+// TIMETABLE
+const ttData=[
+  [{time:"9:00",code:"CH6001",name:"Chemical Reaction Engg.",room:"Room 204",color:"#2563eb",b:"Lec"},{time:"11:00",code:"CH6002",name:"Mass Transfer",room:"Room 301",color:"#7c3aed",b:"Lec"},{time:"2:00",code:"CH6005L",name:"Process Simulation Lab",room:"Lab 3",color:"#dc2626",b:"Lab"}],
+  [{time:"9:00",code:"CH6001",name:"Chemical Reaction Engg.",room:"Room 204",color:"#2563eb",b:"Done"},{time:"10:30",code:"CH6002",name:"Mass Transfer",room:"Room 301",color:"#7c3aed",b:"Now"},{time:"12:00",code:"—",name:"Lunch Break",room:"1 hour",color:"#d97706",b:"Break"},{time:"1:00",code:"CH6005",name:"Process Control",room:"Room 202",color:"#059669",b:"Lec"},{time:"2:00",code:"CH6005L",name:"Process Control Lab",room:"Lab 3",color:"#dc2626",b:"Lab"},{time:"4:00",code:"CH6004",name:"Heat Transfer",room:"Room 105",color:"#0891b2",b:"Lec"}],
+  [{time:"9:00",code:"CH6004",name:"Heat Transfer",room:"Room 105",color:"#7c3aed",b:"Lec"},{time:"11:00",code:"CH6003",name:"Biochemical Engg.",room:"Room 202",color:"#059669",b:"Lec"},{time:"2:00",code:"CH6002L",name:"Mass Transfer Lab",room:"Lab 2",color:"#dc2626",b:"Lab"}],
+  [{time:"9:00",code:"CH6005",name:"Process Control",room:"Room 202",color:"#0891b2",b:"Lec"},{time:"11:00",code:"CH6001",name:"Chemical Reaction Engg.",room:"Room 204",color:"#2563eb",b:"Lec"},{time:"2:00",code:"MP6001",name:"Mini Project",room:"Lab 4",color:"#d97706",b:"Proj"}],
+  [{time:"9:00",code:"CH6002",name:"Mass Transfer",room:"Room 301",color:"#7c3aed",b:"Lec"},{time:"11:00",code:"CH6004",name:"Heat Transfer",room:"Room 105",color:"#059669",b:"Lec"},{time:"1:00",code:"CH6003",name:"Biochemical Engg.",room:"Room 202",color:"#2563eb",b:"Lec"},{time:"3:00",code:"SEM",name:"Seminar",room:"Seminar Hall",color:"#d97706",b:"Sem"}],
+  [{time:"9:00",code:"CH6001",name:"Tutorial: CRE",room:"Room 204",color:"#2563eb",b:"Tut"},{time:"11:00",code:"CH6002",name:"Tutorial: Mass Transfer",room:"Room 301",color:"#059669",b:"Tut"}]
+];
+const dnames=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+function showDay(i,el){
+  document.querySelectorAll(".day-chip").forEach(c=>c.classList.remove("active"));
+  if(el)el.classList.add("active");
+  const cls=ttData[i]||[];
+  let h=`<div class="section-title">${dnames[i]}</div>`;
+  if(!cls.length)h+=`<div class="card" style="text-align:center;color:var(--text3);padding:28px">No classes today 🎉</div>`;
+  else cls.forEach(c=>{h+=`<div class="class-item"><div class="class-time">${c.time}</div><div class="class-dot" style="background:${c.color}"></div><div class="class-info"><div class="class-name">${c.name}</div><div class="class-code">${c.code}</div><div class="class-meta">${c.room}</div></div><span class="class-badge bg-blue c-blue">${c.b}</span></div>`;});
+  document.getElementById("tt-content").innerHTML=h;
+}
+
+// ATTENDANCE DETAIL
+function openAttDetail(subject,code,staffNum,pct,present,total,timing){
+  document.getElementById("att-detail-title").textContent=code+" "+subject;
+  const absent=total-present,col=pct>=75?"#059669,#0891b2":"#dc2626,#f97316";
+  let h=`<div class="card" style="background:linear-gradient(135deg,${col});border:none;color:#fff;margin-bottom:13px">
+    <div style="font-size:11px;opacity:.75;font-weight:600;margin-bottom:3px">${code} · ${subject.toUpperCase()}</div>
+    <div style="font-size:34px;font-weight:800">${pct}%</div>
+    <div style="font-size:12px;opacity:.8;margin-top:3px">${present} Present · ${absent} Absent · ${total} Total</div>
+    <div style="font-size:11px;opacity:.7;margin-top:2px">Staff #${staffNum} · ${timing}</div>
+  </div>`;
+  if(pct<75){h+=`<div class="risk-banner"><div class="risk-title">⚠️ Below 75% — At Risk</div><div class="risk-item">Need ${Math.ceil((0.75*total-present)/(1-0.75))} more classes without absence to reach 75%</div></div>`;}
+  h+=`<div class="section-title">Class-by-Class Record</div>`;
+  const dates=["Jan 6","Jan 8","Jan 10","Jan 13","Jan 15","Jan 17","Jan 20","Jan 22","Jan 24","Jan 27","Jan 29","Feb 3","Feb 5","Feb 10","Feb 12","Feb 14","Feb 17"];
+  const pat=[1,1,1,0,1,1,1,0,1,1,1,1,0,1,1,1,1];
+  for(let j=0;j<Math.min(total,dates.length);j++){const isP=pat[j%pat.length]===1&&j<present;h+=`<div class="att-class-item"><div class="att-class-date">${dates[j%dates.length]}</div><div class="att-class-info"><div class="att-class-subject">Class ${j+1} · ${timing}</div><div class="att-class-staff">Staff #${staffNum}</div></div><span class="att-status ${isP?"bg-green c-green":"bg-red c-red"}">${isP?"✅ Present":"❌ Absent"}</span></div>`;}
+  document.getElementById("att-detail-content").innerHTML=h;navigate("att-detail");
+}
+
+function toggleSem(card){const b=card.querySelector(".sem-body"),open=b.classList.contains("open");document.querySelectorAll(".sem-body").forEach(x=>x.classList.remove("open"));if(!open)b.classList.add("open");}
+function fileUploaded(inp,sid){if(inp.files&&inp.files[0]){const fn=inp.files[0].name;const el=document.getElementById(sid);el.textContent="✅ Uploaded: "+fn;el.style.display="block";showToast("Uploaded: "+fn);}}
+function openEventModal(name){document.getElementById("ev-modal-title").textContent="Register: "+name;document.getElementById("event-modal").classList.add("open");}
+function submitEvent(){const n=document.getElementById("ev-name").value,r=document.getElementById("ev-reg").value,e=document.getElementById("ev-email").value,p=document.getElementById("ev-phone").value;if(!n||!r||!e||!p){showToast("Fill all fields ⚠️");return;}closeModal("event-modal");showToast("Registered! 🎉");}
+function closeModal(id){document.getElementById(id).classList.remove("open");}
+
+// CHAT
+const cHist={};
+function openChat(name,avatar){document.getElementById("chat-name").textContent=name;document.getElementById("chat-avatar").textContent=avatar;if(!cHist[name])cHist[name]=[{t:"Hi! How can I help?",s:false,time:"Now"}];renderChat(name);navigate("chat");window._cc=name;}
+function renderChat(name){const msgs=cHist[name]||[],c=document.getElementById("chat-msgs");c.innerHTML=msgs.map(m=>`<div class="msg-bubble ${m.s?"sent":"recv"}">${m.t}<div class="bubble-time">${m.time}</div></div>`).join("");c.scrollTop=c.scrollHeight;}
+function sendMsg(){const inp=document.getElementById("chat-in"),text=inp.value.trim();if(!text)return;const name=window._cc,now=new Date(),time=now.getHours()+":"+String(now.getMinutes()).padStart(2,"0");if(!cHist[name])cHist[name]=[];cHist[name].push({t:text,s:true,time});inp.value="";renderChat(name);setTimeout(()=>{const r=["Got it! 👍","Sure!","Thanks!","Will do!","OK 👌","Understood!"];cHist[name].push({t:r[Math.floor(Math.random()*r.length)],s:false,time});renderChat(name);},900);}
+function openNewChatModal(){document.getElementById("newchat-modal").classList.add("open");}
+
+// PERFORMANCE GRAPH
+function drawGraph(){const data=[{s:"S1",v:7.45},{s:"S2",v:7.40},{s:"S3",v:7.50},{s:"S4",v:7.70},{s:"S5",v:7.80},{s:"S6",v:7.62}],min=7,max=8.5,range=max-min,colors=["#93c5fd","#60a5fa","#3b82f6","#2563eb","#1d4ed8","#1e40af"],c=document.getElementById("sgpa-graph");if(!c)return;c.innerHTML=data.map((d,i)=>{const h=((d.v-min)/range)*100;return`<div class="graph-bar-wrap"><div style="font-size:10px;font-weight:800;color:var(--text)">${d.v}</div><div style="flex:1;width:100%;display:flex;align-items:flex-end"><div style="height:${h}%;width:100%;background:${colors[i]};border-radius:6px 6px 0 0;min-height:8px"></div></div><div style="font-size:10px;color:var(--text3);font-weight:600">${d.s}</div></div>`;}).join("");}
+
+// FEEDBACK
+const subjects=[{code:"CH6001",name:"Chemical Reaction Engg.",staff:"Dr. Sundar"},{code:"CH6002",name:"Mass Transfer",staff:"Prof. Ramesh"},{code:"CH6003",name:"Biochemical Engg.",staff:"Prof. Anitha"},{code:"CH6004",name:"Heat Transfer",staff:"Dr. Priya"},{code:"CH6005",name:"Process Control",staff:"Prof. Krishnan"}];
+const fbRatings={};
+function renderFeedback(){
+  const c=document.getElementById("feedback-container");
+  if(!c)return;
+  c.innerHTML=subjects.map(s=>`
+    <div class="feedback-item">
+      <div class="feedback-subname">${s.name}</div>
+      <div class="feedback-code">${s.code} · ${s.staff}</div>
+      <div class="feedback-label">Teaching Quality</div>
+      <div class="star-row" data-key="${s.code}-teach">${[1,2,3,4,5].map(n=>`<span class="star ${(fbRatings[s.code+'teach']||0)>=n?'active':''}" onclick="setRating('${s.code}','teach',${n})">⭐</span>`).join('')}</div>
+      <div class="feedback-label">Subject Content</div>
+      <div class="star-row" data-key="${s.code}-content">${[1,2,3,4,5].map(n=>`<span class="star ${(fbRatings[s.code+'content']||0)>=n?'active':''}" onclick="setRating('${s.code}','content',${n})">⭐</span>`).join('')}</div>
+      <div class="feedback-label">Remarks (optional)</div>
+      <textarea style="width:100%;padding:8px 11px;border-radius:10px;border:2px solid var(--border);background:var(--bg);font-family:inherit;font-size:12px;outline:none;resize:none;height:60px" placeholder="Your feedback..."></textarea>
+    </div>`).join('');
+}
+function setRating(code,type,val){fbRatings[code+type]=val;renderFeedback();}
+function submitFeedback(){showToast("Feedback submitted! Thank you 🙏");}
+
+// REMINDERS
+function addReminder(){
+  const title=document.getElementById("rem-title").value.trim();
+  const dt=document.getElementById("rem-dt").value;
+  const type=document.getElementById("rem-type").value;
+  if(!title){showToast("Enter a reminder title");return;}
+  const dtStr=dt?new Date(dt).toLocaleString("en-IN",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}):"No time set";
+  const item=document.createElement("div");item.className="reminder-item";
+  item.innerHTML=`<div><div class="reminder-text">${title}</div><div class="reminder-time">${dtStr} · ${type}</div></div><button class="reminder-del" onclick="this.closest('.reminder-item').remove();showToast('Reminder deleted')">×</button>`;
+  document.getElementById("reminders-list").prepend(item);
+  document.getElementById("rem-title").value="";document.getElementById("rem-dt").value="";
+  showToast("Reminder added! ⏰");
+}
+
+// CANTEEN
+const canteenShops=[
+  {id:0,name:"Sai Annapoorna",block:"Near Block A",emoji:"🍱",status:"Open",items:[{n:"Idli (2 pcs)",p:20},{n:"Masala Dosa",p:35},{n:"Vada",p:15},{n:"Sambar Rice",p:40},{n:"Curd Rice",p:30}]},
+  {id:1,name:"Sri Krishna Mess",block:"Near Block B",emoji:"🍛",status:"Open",items:[{n:"Meals (Full)",p:60},{n:"Chicken Rice",p:80},{n:"Veg Biryani",p:65},{n:"Rasam Rice",p:35},{n:"Chapati (2)",p:25}]},
+  {id:2,name:"Campus Cafe",block:"Admin Block",emoji:"☕",status:"Open",items:[{n:"Coffee",p:15},{n:"Tea",p:10},{n:"Cold Coffee",p:35},{n:"Sandwich",p:40},{n:"Maggi",p:30}]},
+  {id:3,name:"Juice Corner",block:"Near Hostel C",emoji:"🥤",status:"Open",items:[{n:"Fresh Lime",p:20},{n:"Mango Juice",p:30},{n:"Watermelon",p:25},{n:"Mixed Fruit",p:40},{n:"Sugarcane",p:20}]},
+  {id:4,name:"Spicy Bites",block:"Sports Ground",emoji:"🌶️",status:"Open",items:[{n:"Pani Puri",p:20},{n:"Bhel Puri",p:25},{n:"Chicken Lollipop",p:60},{n:"Gobi 65",p:45},{n:"Parotta",p:30}]},
+  {id:5,name:"Meenatchi Bakery",block:"Near Gate",emoji:"🍞",status:"Open",items:[{n:"Bread Toast",p:15},{n:"Egg Puff",p:20},{n:"Cake Slice",p:30},{n:"Bun",p:10},{n:"Samosa",p:15}]},
+  {id:6,name:"Noodle Hub",block:"Lab Complex",emoji:"🍜",status:"Open",items:[{n:"Veg Noodles",p:45},{n:"Egg Noodles",p:55},{n:"Fried Rice",p:50},{n:"Spring Roll",p:35},{n:"Chilly Parotta",p:60}]},
+  {id:7,name:"South Side Kitchen",block:"Near Library",emoji:"🥘",status:"Open",items:[{n:"Mini Tiffin",p:25},{n:"Pongal",p:20},{n:"Upma",p:15},{n:"Pesarattu",p:25},{n:"Rava Dosa",p:30}]},
+  {id:8,name:"Fruit Stall",block:"Main Ground",emoji:"🍎",status:"Open",items:[{n:"Banana (1)",p:5},{n:"Apple",p:20},{n:"Orange (2)",p:15},{n:"Cut Fruit Bowl",p:30},{n:"Papaya",p:20}]},
+  {id:9,name:"Chill Zone",block:"Near Hostel D",emoji:"🍦",status:"Closed",items:[{n:"Ice Cream",p:25},{n:"Kulfi",p:20},{n:"Milkshake",p:40},{n:"Buttermilk",p:10},{n:"Lassi",p:30}]}
+];
+function renderCanteen(){
+  const c=document.getElementById("canteen-list");if(!c)return;
+  c.innerHTML=canteenShops.map(s=>`
+    <div class="shop-card" onclick="openShop(${s.id})">
+      <div class="shop-header">
+        <div><div class="shop-name">${s.emoji} ${s.name}</div><div class="shop-location">📍 ${s.block}</div></div>
+        <span class="shop-status ${s.status==='Open'?'bg-green c-green':'bg-red c-red'}">${s.status}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">${s.items.length} items · Tap to view &amp; order</div>
+    </div>`).join('');
+}
+function openShop(id){
+  const s=canteenShops[id];
+  document.getElementById("shop-title").textContent=s.emoji+" "+s.name;
+  const cart={};
+  let h=`<div class="card" style="background:linear-gradient(135deg,#d97706,#f59e0b);border:none;color:#fff;margin-bottom:13px">
+    <div style="font-size:13px;font-weight:800">${s.emoji} ${s.name}</div>
+    <div style="font-size:11px;opacity:.8">📍 ${s.block} · ${s.status==='Open'?'🟢 Open Now':'🔴 Closed'}</div>
+  </div>
+  <div class="section-title">Live Menu</div>
+  <div class="card" style="padding:0;overflow:hidden">`;
+  s.items.forEach((item,i)=>{
+    h+=`<div class="menu-item" style="padding:12px 14px">
+      <div><div class="menu-name">${item.n}</div></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="menu-price">₹${item.p}</div>
+        <button class="menu-add" onclick="showToast('${item.n} added to cart! 🛒')">+</button>
+      </div>
+    </div>`;
+  });
+  h+=`</div><button class="btn-primary" onclick="showToast('Order placed at ${s.name}! 🍽️ Est. 15 min')">🛒 Place Order</button>`;
+  h+=`<button onclick="navigate('canteen')" style="width:100%;padding:12px;border-radius:12px;background:transparent;border:2px solid var(--border);font-family:inherit;font-size:14px;font-weight:600;color:var(--text2);margin-top:8px;cursor:pointer;">← Back to Shops</button>`;
+  document.getElementById("shop-content").innerHTML=h;
+  navigate("canteen-shop");
+}
+
+// SERVICE WORKER
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));
+
+// Touch handling
+document.addEventListener('touchstart',function(){},{passive:true});
+document.addEventListener('dblclick',function(e){
+  if(e.target.closest('button,a,.nav-item,.qa-item,.att-subject,.sem-card,.msg-item,.day-chip,.icon-btn,.back-btn,.sidebar-item,.shop-card,.teacher-item,.stat-card')){e.preventDefault();}
+},{passive:false});
+
+document.addEventListener("DOMContentLoaded",()=>{
+  const chips=document.querySelectorAll(".day-chip");
+  if(chips[1])showDay(1,chips[1]);
+});
+</script>
+</body>
+</html>

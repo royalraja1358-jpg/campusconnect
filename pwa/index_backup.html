@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusConnect</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="CampusConnect">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg: #f0f4ff;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --border: #e4eaf5;
+  --primary: #2563eb;
+  --primary-light: #eff4ff;
+  --primary-dark: #1d4ed8;
+  --secondary: #7c3aed;
+  --accent: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --text: #0f172a;
+  --text2: #475569;
+  --text3: #94a3b8;
+  --nav-h: 72px;
+  --header-h: 64px;
+  --radius: 18px;
+  --shadow: 0 4px 24px rgba(37,99,235,0.10);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: #dce8ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* PHONE SHELL */
+.phone {
+  width: 390px;
+  height: 844px;
+  background: var(--bg);
+  border-radius: 48px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.25), 0 0 0 10px #1a1a2e, 0 0 0 12px #2563eb33;
+  display: flex;
+  flex-direction: column;
+}
+
+/* STATUS BAR */
+.status-bar {
+  height: 44px;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  flex-shrink: 0;
+  z-index: 100;
+}
+.status-icons { display: flex; gap: 6px; align-items: center; }
+.status-icons span { font-size: 12px; }
+
+/* SCREENS */
+.screen { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+.screen.active { display: flex; }
+
+/* LOGIN SCREEN */
+#screen-login {
+  background: linear-gradient(160deg, #1e3a8a 0%, #2563eb 40%, #3b82f6 70%, #60a5fa 100%);
+  justify-content: flex-end;
+  padding: 0;
+}
+.login-bg-circles {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; pointer-events: none;
+}
+.login-bg-circles::before {
+  content: ''; position: absolute; width: 300px; height: 300px;
+  background: rgba(255,255,255,0.06); border-radius: 50%;
+  top: -60px; right: -80px;
+}
+.login-bg-circles::after {
+  content: ''; position: absolute; width: 200px; height: 200px;
+  background: rgba(255,255,255,0.04); border-radius: 50%;
+  top: 140px; left: -60px;
+}
+.login-hero {
+  position: absolute; top: 0; left: 0; right: 0;
+  padding: 80px 40px 40px;
+  color: white;
+  z-index: 1;
+}
+.login-logo { font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.7; font-weight: 600; margin-bottom: 16px; }
+.login-title { font-family: 'Instrument Serif', serif; font-size: 44px; line-height: 1.1; margin-bottom: 12px; }
+.login-title em { font-style: italic; opacity: 0.85; }
+.login-sub { font-size: 15px; opacity: 0.65; line-height: 1.5; }
+.login-card {
+  background: white; border-radius: 36px 36px 0 0;
+  padding: 36px 28px 40px; z-index: 2;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.12);
+}
+.login-card h2 { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+.login-card p { font-size: 14px; color: var(--text2); margin-bottom: 28px; }
+.role-selector { display: flex; gap: 8px; margin-bottom: 24px; }
+.role-btn {
+  flex: 1; padding: 10px 6px; border-radius: 12px; border: 2px solid var(--border);
+  background: transparent; font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px; font-weight: 600; color: var(--text2); cursor: pointer; transition: all 0.2s;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.role-btn .r-icon { font-size: 20px; }
+.role-btn.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+.input-group { margin-bottom: 16px; }
+.input-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; letter-spacing: 0.04em; text-transform: uppercase; }
+.input-group input {
+  width: 100%; padding: 14px 16px; border-radius: 14px;
+  border: 2px solid var(--border); background: var(--bg);
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; color: var(--text);
+  outline: none; transition: border-color 0.2s;
+}
+.input-group input:focus { border-color: var(--primary); background: white; }
+.btn-primary {
+  width: 100%; padding: 16px; border-radius: 16px; background: var(--primary);
+  color: white; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px;
+  font-weight: 700; border: none; cursor: pointer; transition: all 0.2s;
+  margin-top: 8px;
+}
+.btn-primary:active { transform: scale(0.98); background: var(--primary-dark); }
+
+/* HEADER */
+.app-header {
+  height: var(--header-h);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  z-index: 50;
+}
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-avatar {
+  width: 38px; height: 38px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: white; font-weight: 700;
+}
+.header-greeting { font-size: 11px; color: var(--text3); font-weight: 500; }
+.header-name { font-size: 15px; font-weight: 700; color: var(--text); }
+.header-actions { display: flex; gap: 8px; }
+.icon-btn {
+  width: 38px; height: 38px; border-radius: 12px; background: var(--bg);
+  border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+  font-size: 18px; cursor: pointer; transition: all 0.15s; position: relative;
+}
+.icon-btn:active { transform: scale(0.92); }
+.badge {
+  position: absolute; top: -4px; right: -4px;
+  width: 16px; height: 16px; background: var(--danger); border-radius: 50%;
+  font-size: 9px; font-weight: 700; color: white;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid white;
+}
+
+/* SCROLL CONTENT */
+.scroll-content {
+  flex: 1; overflow-y: auto; padding: 16px;
+  scrollbar-width: none;
+}
+.scroll-content::-webkit-scrollbar { display: none; }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  height: var(--nav-h);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  padding: 0 8px 8px;
+  flex-shrink: 0;
+  z-index: 100;
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 8px 4px; cursor: pointer; border-radius: 14px; transition: all 0.2s;
+  border: none; background: transparent; font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.nav-item .nav-icon { font-size: 22px; line-height: 1; }
+.nav-item .nav-label { font-size: 10px; font-weight: 600; color: var(--text3); }
+.nav-item.active .nav-label { color: var(--primary); }
+.nav-item.active .nav-icon { filter: none; }
+.nav-center-btn {
+  width: 56px; height: 56px; border-radius: 18px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; margin-top: -20px;
+  box-shadow: 0 8px 20px rgba(37,99,235,0.35);
+  cursor: pointer; flex-shrink: 0;
+  border: none;
+}
+
+/* CARDS & SECTIONS */
+.section-title {
+  font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 12px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.section-title a { font-size: 13px; font-weight: 600; color: var(--primary); cursor: pointer; }
+
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.stat-card {
+  background: var(--card); border-radius: var(--radius); padding: 16px;
+  border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+}
+.stat-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.stat-value { font-size: 26px; font-weight: 800; color: var(--text); line-height: 1; }
+.stat-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+.stat-bar { height: 4px; background: var(--border); border-radius: 99px; margin-top: 10px; }
+.stat-bar-fill { height: 100%; border-radius: 99px; }
+
+.card {
+  background: var(--card); border-radius: var(--radius); padding: 16px;
+  border: 1px solid var(--border); box-shadow: var(--shadow-sm); margin-bottom: 10px;
+}
+
+/* SCHEDULE */
+.schedule-strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; scrollbar-width: none; }
+.schedule-strip::-webkit-scrollbar { display: none; }
+.day-chip {
+  flex-shrink: 0; width: 52px; display: flex; flex-direction: column;
+  align-items: center; gap: 4px; padding: 10px 8px; border-radius: 14px;
+  border: 2px solid var(--border); background: var(--card); cursor: pointer; transition: all 0.2s;
+}
+.day-chip .d-num { font-size: 18px; font-weight: 800; color: var(--text); }
+.day-chip .d-day { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; }
+.day-chip.active { background: var(--primary); border-color: var(--primary); }
+.day-chip.active .d-num, .day-chip.active .d-day { color: white; }
+
+.class-item {
+  display: flex; gap: 12px; align-items: flex-start; padding: 14px;
+  background: var(--card); border-radius: 14px; border: 1px solid var(--border);
+  margin-bottom: 8px; box-shadow: var(--shadow-sm);
+}
+.class-time { font-size: 11px; font-weight: 700; color: var(--text2); width: 52px; flex-shrink: 0; padding-top: 2px; }
+.class-dot { width: 3px; border-radius: 3px; align-self: stretch; flex-shrink: 0; }
+.class-info { flex: 1; }
+.class-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.class-meta { font-size: 12px; color: var(--text2); }
+.class-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 99px; }
+
+/* ATTENDANCE */
+.att-subject {
+  background: var(--card); border-radius: var(--radius); padding: 16px;
+  border: 1px solid var(--border); box-shadow: var(--shadow-sm); margin-bottom: 10px;
+}
+.att-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.att-name { font-size: 15px; font-weight: 700; color: var(--text); }
+.att-pct { font-size: 18px; font-weight: 800; }
+.att-bar-bg { height: 8px; background: var(--border); border-radius: 99px; }
+.att-bar-fill { height: 100%; border-radius: 99px; }
+.att-foot { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); margin-top: 6px; }
+
+/* MARKS */
+.marks-table { width: 100%; border-collapse: collapse; }
+.marks-table th { font-size: 11px; font-weight: 700; color: var(--text3); text-align: left; padding: 8px 12px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid var(--border); }
+.marks-table td { font-size: 13px; padding: 12px; border-bottom: 1px solid var(--border); color: var(--text); }
+.marks-table tr:last-child td { border-bottom: none; }
+.grade-badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; }
+
+/* EVENTS */
+.event-card {
+  border-radius: var(--radius); overflow: hidden; margin-bottom: 12px;
+  box-shadow: var(--shadow); border: 1px solid var(--border);
+}
+.event-banner { height: 100px; display: flex; align-items: flex-end; padding: 12px 16px; position: relative; }
+.event-banner-emoji { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-60%); font-size: 40px; }
+.event-body { background: var(--card); padding: 14px 16px; }
+.event-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+.event-meta { font-size: 12px; color: var(--text2); display: flex; gap: 12px; margin-bottom: 12px; }
+.btn-event { padding: 10px 20px; border-radius: 12px; background: var(--primary); color: white; font-size: 13px; font-weight: 700; border: none; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; }
+.btn-event.registered { background: var(--accent); }
+
+/* MESSAGES */
+.msg-list { display: flex; flex-direction: column; gap: 6px; }
+.msg-item {
+  display: flex; gap: 12px; align-items: center; padding: 12px 14px;
+  background: var(--card); border-radius: 16px; border: 1px solid var(--border); cursor: pointer;
+  transition: all 0.15s;
+}
+.msg-item:active { transform: scale(0.98); }
+.msg-avatar {
+  width: 44px; height: 44px; border-radius: 14px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.msg-body { flex: 1; min-width: 0; }
+.msg-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.msg-preview { font-size: 12px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+.msg-time { font-size: 11px; color: var(--text3); }
+.msg-unread { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; flex-shrink: 0; }
+
+/* PROFILE */
+.profile-hero {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  padding: 28px 20px 20px; margin: -16px -16px 20px; text-align: center; color: white;
+}
+.profile-avatar-lg {
+  width: 80px; height: 80px; border-radius: 24px;
+  background: rgba(255,255,255,0.2); border: 3px solid rgba(255,255,255,0.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; margin: 0 auto 12px;
+}
+.profile-name { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+.profile-role { font-size: 13px; opacity: 0.75; }
+
+.profile-item {
+  display: flex; align-items: center; gap: 14px; padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.profile-item:last-child { border-bottom: none; }
+.profile-icon { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.profile-item-label { font-size: 11px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.profile-item-value { font-size: 14px; font-weight: 600; color: var(--text); margin-top: 1px; }
+
+/* NOTIFICATIONS */
+.notif-item {
+  display: flex; gap: 12px; align-items: flex-start; padding: 14px;
+  background: var(--card); border-radius: 16px; border: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+.notif-icon { width: 42px; height: 42px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.notif-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.notif-desc { font-size: 12px; color: var(--text2); line-height: 1.4; }
+.notif-time { font-size: 11px; color: var(--text3); margin-top: 4px; }
+.notif-dot { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+
+/* ASSIGNMENTS */
+.assign-item {
+  background: var(--card); border-radius: var(--radius); padding: 16px;
+  border: 1px solid var(--border); margin-bottom: 10px; box-shadow: var(--shadow-sm);
+}
+.assign-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.assign-title { font-size: 15px; font-weight: 700; color: var(--text); }
+.assign-subject { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.assign-deadline { font-size: 12px; font-weight: 700; }
+.assign-footer { display: flex; gap: 8px; margin-top: 10px; }
+.btn-sm { padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; }
+.btn-outline { background: var(--primary-light); color: var(--primary); }
+.btn-fill { background: var(--primary); color: white; }
+
+/* LEAVE */
+.leave-form .input-group input, .leave-form select, .leave-form textarea {
+  width: 100%; padding: 13px 16px; border-radius: 14px;
+  border: 2px solid var(--border); background: var(--bg);
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: var(--text);
+  outline: none; transition: border-color 0.2s; appearance: none;
+}
+.leave-form select:focus, .leave-form textarea:focus, .leave-form input:focus { border-color: var(--primary); background: white; }
+.leave-form textarea { resize: none; height: 90px; }
+.leave-form .input-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+.leave-history { margin-top: 20px; }
+.leave-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 14px; background: var(--card); border-radius: 14px;
+  border: 1px solid var(--border); margin-bottom: 8px;
+}
+.leave-left .leave-type { font-size: 14px; font-weight: 700; color: var(--text); }
+.leave-left .leave-dates { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.leave-status { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 99px; }
+
+/* PERFORMANCE */
+.perf-card {
+  background: var(--card); border-radius: var(--radius); padding: 18px;
+  border: 1px solid var(--border); box-shadow: var(--shadow-sm); margin-bottom: 12px;
+}
+.perf-subject { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+.perf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.perf-metric { text-align: center; }
+.perf-val { font-size: 20px; font-weight: 800; }
+.perf-lbl { font-size: 10px; color: var(--text3); font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+
+/* COLORS */
+.c-blue { color: var(--primary); }
+.c-purple { color: var(--secondary); }
+.c-green { color: var(--accent); }
+.c-orange { color: var(--warning); }
+.c-red { color: var(--danger); }
+.bg-blue { background: #eff6ff; }
+.bg-purple { background: #f5f3ff; }
+.bg-green { background: #ecfdf5; }
+.bg-orange { background: #fffbeb; }
+.bg-red { background: #fef2f2; }
+
+/* TOAST */
+.toast {
+  position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%);
+  background: #0f172a; color: white; padding: 12px 20px; border-radius: 14px;
+  font-size: 13px; font-weight: 600; white-space: nowrap; z-index: 999;
+  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* BACK BTN */
+.back-btn {
+  display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600;
+  color: var(--primary); cursor: pointer; border: none; background: transparent;
+  font-family: 'Plus Jakarta Sans', sans-serif; padding: 0;
+}
+
+/* WELCOME BANNER */
+.welcome-banner {
+  background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+  border-radius: var(--radius); padding: 20px; margin-bottom: 16px; color: white; position: relative; overflow: hidden;
+}
+.welcome-banner::after {
+  content: '🎓';
+  position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+  font-size: 48px; opacity: 0.25;
+}
+.welcome-banner .wb-label { font-size: 12px; font-weight: 600; opacity: 0.75; margin-bottom: 4px; letter-spacing: 0.05em; text-transform: uppercase; }
+.welcome-banner .wb-title { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+.welcome-banner .wb-sub { font-size: 13px; opacity: 0.75; }
+
+/* QUICK ACTIONS */
+.quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+.qa-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
+.qa-icon { width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1px solid var(--border); transition: transform 0.15s; box-shadow: var(--shadow-sm); }
+.qa-item:active .qa-icon { transform: scale(0.9); }
+.qa-label { font-size: 10px; font-weight: 600; color: var(--text2); text-align: center; }
+
+/* ANIMATIONS */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.screen.active { animation: fadeIn 0.3s ease; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <!-- STATUS BAR -->
+  <div class="status-bar" id="status-bar">
+    <span>9:41</span>
+    <div style="width:120px;height:32px;background:#000;border-radius:20px;position:absolute;left:50%;transform:translateX(-50%);top:0;"></div>
+    <div class="status-icons"><span>📶</span><span>🔋</span></div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!--            LOGIN SCREEN               -->
+  <!-- ══════════════════════════════════════ -->
+  <div id="screen-login" class="screen active">
+    <div class="login-bg-circles"></div>
+    <div class="login-hero">
+      <div class="login-logo">CampusConnect</div>
+      <div class="login-title">Your campus,<br><em>connected.</em></div>
+      <div class="login-sub">Attendance, marks, events & more — all in one place.</div>
+    </div>
+    <div class="login-card">
+      <h2>Welcome back 👋</h2>
+      <p>Sign in to your account</p>
+      <div class="role-selector">
+        <button class="role-btn active" onclick="selectRole(this,'student')"><span class="r-icon">👨‍🎓</span>Student</button>
+        <button class="role-btn" onclick="selectRole(this,'faculty')"><span class="r-icon">👩‍🏫</span>Faculty</button>
+        <button class="role-btn" onclick="selectRole(this,'admin')"><span class="r-icon">🏫</span>Admin</button>
+      </div>
+      <div class="input-group">
+        <label>Email / Roll No</label>
+        <input type="text" placeholder="e.g. 2021CS042" value="2021CS042">
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" placeholder="••••••••" value="password123">
+      </div>
+      <button class="btn-primary" onclick="doLogin()">Sign In →</button>
+      <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--text3)">Secured with JWT · bcrypt encryption</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!--            HOME / DASHBOARD           -->
+  <!-- ══════════════════════════════════════ -->
+  <div id="screen-home" class="screen">
+    <div class="app-header">
+      <div class="header-left">
+        <div class="header-avatar">A</div>
+        <div>
+          <div class="header-greeting">Good morning ☀️</div>
+          <div class="header-name">Arjun Sharma</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="icon-btn" onclick="navigate('notifications')">🔔<span class="badge">3</span></div>
+        <div class="icon-btn" onclick="navigate('messages')">💬</div>
+      </div>
+    </div>
+    <div class="scroll-content">
+      <div class="welcome-banner">
+        <div class="wb-label">Semester 5 · CSE</div>
+        <div class="wb-title">You have 3 classes today</div>
+        <div class="wb-sub">Next: Data Structures at 10:30 AM</div>
+      </div>
+
+      <div class="quick-actions">
+        <div class="qa-item" onclick="navigate('timetable')"><div class="qa-icon bg-blue">📅</div><div class="qa-label">Timetable</div></div>
+        <div class="qa-item" onclick="navigate('attendance')"><div class="qa-icon bg-green">✅</div><div class="qa-label">Attendance</div></div>
+        <div class="qa-item" onclick="navigate('marks')"><div class="qa-icon bg-purple">📊</div><div class="qa-label">Marks</div></div>
+        <div class="qa-item" onclick="navigate('assignments')"><div class="qa-icon bg-orange">📁</div><div class="qa-label">Assignments</div></div>
+        <div class="qa-item" onclick="navigate('events')"><div class="qa-icon bg-red">🎉</div><div class="qa-label">Events</div></div>
+        <div class="qa-item" onclick="navigate('leave')"><div class="qa-icon bg-blue">📝</div><div class="qa-label">Leave</div></div>
+        <div class="qa-item" onclick="navigate('performance')"><div class="qa-icon bg-green">📈</div><div class="qa-label">Performance</div></div>
+        <div class="qa-item" onclick="navigate('messages')"><div class="qa-icon bg-purple">💬</div><div class="qa-label">Messages</div></div>
+      </div>
+
+      <div class="section-title">Today's Overview</div>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-label">Attendance</div>
+          <div class="stat-value c-green">82%</div>
+          <div class="stat-sub">6 subjects</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:82%;background:var(--accent)"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">CGPA</div>
+          <div class="stat-value c-blue">8.4</div>
+          <div class="stat-sub">Sem 5</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:84%;background:var(--primary)"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Assignments</div>
+          <div class="stat-value c-orange">3</div>
+          <div class="stat-sub">Due this week</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:30%;background:var(--warning)"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Events</div>
+          <div class="stat-value c-purple">5</div>
+          <div class="stat-sub">Upcoming</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:50%;background:var(--secondary)"></div></div>
+        </div>
+      </div>
+
+      <div class="section-title">Today's Classes <a onclick="navigate('timetable')">Full Schedule</a></div>
+      <div class="class-item">
+        <div class="class-time">9:00<br>AM</div>
+        <div class="class-dot" style="background:#2563eb"></div>
+        <div class="class-info">
+          <div class="class-name">Operating Systems</div>
+          <div class="class-meta">Prof. Meena · Room 204</div>
+        </div>
+        <span class="class-badge bg-green c-green">Done</span>
+      </div>
+      <div class="class-item">
+        <div class="class-time">10:30<br>AM</div>
+        <div class="class-dot" style="background:#7c3aed"></div>
+        <div class="class-info">
+          <div class="class-name">Data Structures</div>
+          <div class="class-meta">Prof. Kumar · Room 301</div>
+        </div>
+        <span class="class-badge bg-blue c-blue">Now</span>
+      </div>
+      <div class="class-item">
+        <div class="class-time">2:00<br>PM</div>
+        <div class="class-dot" style="background:#059669"></div>
+        <div class="class-info">
+          <div class="class-name">DBMS Lab</div>
+          <div class="class-meta">Prof. Sharma · Lab 1</div>
+        </div>
+        <span class="class-badge bg-orange c-orange">Later</span>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item active" onclick="navigate('home')"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></button>
+      <button class="nav-item" onclick="navigate('attendance')"><span class="nav-icon">✅</span><span class="nav-label">Attend</span></button>
+      <button class="nav-center-btn" onclick="navigate('timetable')">📅</button>
+      <button class="nav-item" onclick="navigate('marks')"><span class="nav-icon">📊</span><span class="nav-label">Marks</span></button>
+      <button class="nav-item" onclick="navigate('profile')"><span class="nav-icon">👤</span><span class="nav-label">Profile</span></button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!--            TIMETABLE                  -->
+  <!-- ══════════════════════════════════════ -->
+  <div id="screen-timetable" class="screen">
+    <div class="app-header">
+      <div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div>
+      <div style="font-size:16px;font-weight:800">Timetable</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="scroll-content">
+      <div class="schedule-strip">
+        <div class="day-chip"><span class="d-num">17</span><span class="d-day">Mon</span></div>
+        <div class="day-chip active"><span class="d-num">18</span><span class="d-day">Tue</span></div>
+        <div class="day-chip"><span class="d-num">19</span><span class="d-day">Wed</span></div>
+        <div class="day-chip"><span class="d-num">20</span><span class="d-day">Thu</span></div>
+        <div class="day-chip"><span class="d-num">21</span><span class="d-day">Fri</span></div>
+        <div class="day-chip"><span class="d-num">22</span><span class="d-day">Sat</span></div>
+      </div>
+      <div class="section-title">Tuesday, Feb 18</div>
+      <div class="class-item"><div class="class-time">9:00<br>AM</div><div class="class-dot" style="background:#2563eb"></div><div class="class-info"><div class="class-name">Operating Systems</div><div class="class-meta">Prof. Meena · Room 204 · 1hr</div></div><span class="class-badge bg-blue c-blue">Lec</span></div>
+      <div class="class-item"><div class="class-time">10:30<br>AM</div><div class="class-dot" style="background:#7c3aed"></div><div class="class-info"><div class="class-name">Data Structures</div><div class="class-meta">Prof. Kumar · Room 301 · 1hr</div></div><span class="class-badge bg-purple c-purple">Lec</span></div>
+      <div class="class-item"><div class="class-time">12:00<br>PM</div><div class="class-dot" style="background:#d97706"></div><div class="class-info"><div class="class-name">Lunch Break</div><div class="class-meta">1 hour</div></div><span class="class-badge bg-orange c-orange">Break</span></div>
+      <div class="class-item"><div class="class-time">1:00<br>PM</div><div class="class-dot" style="background:#059669"></div><div class="class-info"><div class="class-name">Computer Networks</div><div class="class-meta">Prof. Rao · Room 202 · 1hr</div></div><span class="class-badge bg-green c-green">Lec</span></div>
+      <div class="class-item"><div class="class-time">2:00<br>PM</div><div class="class-dot" style="background:#dc2626"></div><div class="class-info"><div class="class-name">DBMS Lab</div><div class="class-meta">Prof. Sharma · Lab 1 · 2hrs</div></div><span class="class-badge bg-red c-red">Lab</span></div>
+      <div class="class-item"><div class="class-time">4:00<br>PM</div><div class="class-dot" style="background:#0891b2"></div><div class="class-info"><div class="class-name">Software Engineering</div><div class="class-meta">Prof. Singh · Room 105 · 1hr</div></div><span class="class-badge bg-blue c-blue">Lec</span></div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="navigate('home')"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></button>
+      <button class="nav-item" onclick="navigate('attendance')"><span class="nav-icon">✅</span><span class="nav-label">Attend</span></button>
+      <button class="nav-center-btn" style="background:linear-gradient(135deg,#059669,#0891b2)">📅</button>
+      <button class="nav-item" onclick="navigate('marks')"><span class="nav-icon">📊</span><span class="nav-label">Marks</span></button>
+      <button class="nav-item" onclick="navigate('profile')"><span class="nav-icon">👤</span><span class="nav-label">Profile</span></button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!--            ATTENDANCE                 -->
+  <!-- ══════════════════════════════════════ -->
+  <div id="screen-attendance" class="screen">
+    <div class="app-header">
+      <div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div>
+      <div style="font-size:16px;font-weight:800">Attendance</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="scroll-content">
+      <div class="card" style="background:linear-gradient(135deg,#2563eb,#7c3aed);border:none;color:white;margin-bottom:16px">
+        <div style="font-size:13px;opacity:.75;font-weight:600;margin-bottom:8px">OVERALL ATTENDANCE</div>
+        <div style="font-size:42px;font-weight:800;margin-bottom:4px">82%</div>
+        <div style="font-size:13px;opacity:.8">Above 75% threshold · You're safe ✅</div>
+      </div>
+      <div class="section-title">Subject-wise</div>
+      <div class="att-subject">
+        <div class="att-header"><div class="att-name">Data Structures</div><div class="att-pct c-green">91%</div></div>
+        <div class="att-bar-bg"><div class="att-bar-fill" style="width:91%;background:#059669"></div></div>
+        <div class="att-foot"><span>41/45 classes</span><span>Prof. Kumar</span></div>
+      </div>
+      <div class="att-subject">
+        <div class="att-header"><div class="att-name">Operating Systems</div><div class="att-pct c-green">86%</div></div>
+        <div class="att-bar-bg"><div class="att-bar-fill" style="width:86%;background:#059669"></div></div>
+        <div class="att-foot"><span>37/43 classes</span><span>Prof. Meena</span></div>
+      </div>
+      <div class="att-subject">
+        <div class="att-header"><div class="att-name">Computer Networks</div><div class="att-pct c-orange">76%</div></div>
+        <div class="att-bar-bg"><div class="att-bar-fill" style="width:76%;background:#d97706"></div></div>
+        <div class="att-foot"><span>35/46 classes</span><span>Prof. Rao</span></div>
+      </div>
+      <div class="att-subject">
+        <div class="att-header"><div class="att-name">DBMS</div><div class="att-pct c-red">68%</div></div>
+        <div class="att-bar-bg"><div class="att-bar-fill" style="width:68%;background:#dc2626"></div></div>
+        <div class="att-foot"><span>30/44 classes · ⚠️ Below 75%</span><span>Prof. Sharma</span></div>
+      </div>
+      <div class="att-subject">
+        <div class="att-header"><div class="att-name">Software Engineering</div><div class="att-pct c-green">88%</div></div>
+        <div class="att-bar-bg"><div class="att-bar-fill" style="width:88%;background:#059669"></div></div>
+        <div class="att-foot"><span>38/43 classes</span><span>Prof. Singh</span></div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="navigate('home')"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></button>
+      <button class="nav-item active"><span class="nav-icon">✅</span><span class="nav-label">Attend</span></button>
+      <button class="nav-center-btn">📅</button>
+      <button class="nav-item" onclick="navigate('marks')"><span class="nav-icon">📊</span><span class="nav-label">Marks</span></button>
+      <button class="nav-item" onclick="navigate('profile')"><span class="nav-icon">👤</span><span class="nav-label">Profile</span></button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!--            MARKS                      -->
+  <!-- ══════════════════════════════════════ -->
+  <div id="screen-marks" class="screen">
+    <div class="app-header">
+      <div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div>
+      <div style="font-size:16px;font-weight:800">Marks & Results</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="scroll-content">
+      <div class="stat-grid" style="margin-bottom:20px">
+        <div class="stat-card"><div class="stat-label">SGPA</div><div class="stat-value c-blue">8.4</div><div class="stat-sub">Sem 5</div></div>
+        <div class="stat-card"><div class="stat-label">CGPA</div><div class="stat-value c-purple">8.2</div><div class="stat-sub">Overall</div></div>
+      </div>
+      <div class="section-title">Internals — Semester 5</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="marks-table">
+          <tr><th>Subject</th><th>Int.</th><th>Mid</th><th>Grade</th></tr>
+          <tr><td>Data Structures</td><td>47/50</td><td>23/25</td><td><span class="grade-badge bg-green c-green">A+</span></td></tr>
+          <tr><td>OS</td><td>42/50</td><td>21/25</td><td><span class="grade-badge bg-blue c-blue">A</span></td></tr>
+          <tr><td>Networks</td><td>38/50</td><td>19/25</td><td><span class="grade-badge bg-orange c-orange">B+</span></td></tr>
+          <tr><td>DBMS</td><td>35/50</td><td>17/25</td><td><span class="grade-badge bg-orange c-orange">B</span></td></tr>
+          <tr><td>SE</td><td>44/50</td><td>22/25</td><td><span class="grade-badge bg-green c-green">A</span></td></tr>
+        </table>
+      </div>
+      <div class="section-title" style="margin-top:16px">Previous Semesters</div>
+      <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700">Semester 4</div><div style="font-size:13px;color:var(--text2)">Apr 2024</div></div><div class="att-pct c-blue">8.6 SGPA</div></div></div>
+      <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700">Semester 3</div><div style="font-size:13px;color:var(--text2)">Nov 2023</div></div><div class="att-pct c-green">8.1 SGPA</div></div></div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="navigate('home')"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></button>
+      <button class="nav-item" onclick="navigate('attendance')"><span class="nav-icon">✅</span><span class="nav-label">Attend</span></button>
+      <button class="nav-center-btn">📅</button>
+      <button class="nav-item active"><span class="nav-icon">📊</span><span class="nav-label">Marks</span></button>
+      <button class="nav-item" onclick="navigate('profile')"><span class="nav-icon">👤</span><span class="nav-label">Profile</span></button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!--            ASSIGNMENTS                -->
+  <!-- ══════════════════════════════════════ -->
+  <div id="screen-assignments" class="screen">
+    <div class="app-header">
+      <div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div>
+      <div style="font-size:16px;font-weight:800">Assignments</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="scroll-content">
+      <div class="section-title">Pending (3)</div>
+      <div class="assign-item">
+        <div class="assign-header">
+          <div><div class="assign-title">Dijkstra's Algorithm Implementation</div><div class="assign-subject">Data Structures · Prof. Kumar</div></div>
+          <div class="assign-deadline c-red">Feb 20</div>
+        </div>
+        <div style="font-size:13px;color:var(--text2)">Implement shortest path algorithm and submit code + report.</div>
+        <div class="assign-footer">
+          <button class="btn-sm btn-outline">📥 Download</button>
+          <button class="btn-sm btn-fill" onclick="showToast('Assignment uploaded! ✅')">📤 Upload</button>
+        </div>
+      </div>
+      <div class="assign-item">
+        <div class="assign-header">
+          <div><div class="assign-title">ER Diagram — Library System</div><div class="assign-subject">DBMS · Prof. Sharma</div></div>
+          <div class="assign-deadline c-orange">Feb 22</div>
+        </div>
+        <div style="font-size:13px;color:var(--text2)">Design a complete ER diagram for a library management system.</div>
+        <div class="assign-footer">
+          <button class="btn-sm btn-outline">📥 Download</button>
+          <button class="btn-sm btn-fill" onclick="showToast('Assignment uploaded! ✅')">📤 Upload</button>
+        </div>
+      </div>
+      <div class="assign-item">
+        <div class="assign-header">
+          <div><div class="assign-title">TCP/IP Protocol Analysis</div><div class="assign-subject">Networks · Prof. Rao</div></div>
+          <div class="assign-deadline c-orange">Feb 25</div>
+        </div>
+        <div style="font-size:13px;color:var(--text2)">Wireshark packet capture and TCP/IP analysis report.</div>
+        <div class="assign-footer">
+          <button class="btn-sm btn-outline">📥 Download</button>
+          <button class="btn-sm btn-fill" onclick="showToast('Assignment uploaded! ✅')">📤 Upload</button>
+        </div>
+      </div>
+      <div class="section-title" style="margin-top:8px">Submitted (2)</div>
+      <div class="assign-item" style="opacity:0.65">
+        <div class="assign-header">
+          <div><div class="assign-title">Process Scheduling Simulation</div><div class="assign-subject">OS · Prof. Meena</div></div>
+          <span class="class-badge bg-green c-green">Submitted</span>
+        </div>
+      </div>
+      <div class="assign-item" style="opacity:0.65">
+        <div class="assign-header">
+          <div><div class="assign-title">UML Class Diagram</div><div class="assign-subject">SE · Prof. Singh</div></div>
+          <span class="class-badge bg-green c-green">Submitted</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!--            EVENTS                     -->
+  <!-- ══════════════════════════════════════ -->
+  <div id="screen-events" class="screen">
+    <div class="app-header">
+      <div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div>
+      <div style="font-size:16px;font-weight:800">Campus Events</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="scroll-content">
+      <div class="event-card">
+        <div class="event-banner" style="background:linear-gradient(135deg,#1e3a8a,#3b82f6)">
+          <div class="event-banner-emoji">💻</div>
+        </div>
+        <div class="event-body">
+          <div class="event-title">National Level Hackathon 2025</div>
+          <div class="event-meta"><span>📅 Feb 28–Mar 1</span><span>📍 Main Auditorium</span></div>
+          <button class="btn-event registered" onclick="showToast('You are registered! 🎉')">✅ Registered</button>
+        </div>
+      </div>
+      <div class="event-card">
+        <div class="event-banner" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)">
+          <div class="event-banner-emoji">🎭</div>
+        </div>
+        <div class="event-body">
+          <div class="event-title">Cultural Fest — Kalakriti 2025</div>
+          <div class="event-meta"><span>📅 Mar 8–10</span><span>📍 Open Air Theatre</span></div>
+          <button class="btn-event" onclick="registerEvent(this)">Register Now</button>
+        </div>
+      </div>
+      <div class="event-card">
+        <div class="event-banner" style="background:linear-gradient(135deg,#059669,#34d399)">
+          <div class="event-banner-emoji">🧠</div>
+        </div>
+        <div class="event-body">
+          <div class="event-title">AI/ML Workshop — Hands On</div>
+          <div class="event-meta"><span>📅 Mar 15</span><span>📍 Lab Complex B</span></div>
+          <button class="btn-event" onclick="registerEvent(this)">Register Now</button>
+        </div>
+      </div>
+      <div class="event-card">
+        <div class="event-banner" style="background:linear-gradient(135deg,#d97706,#fbbf24)">
+          <div class="event-banner-emoji">🏆</div>
+        </div>
+        <div class="event-body">
+          <div class="event-title">Sports Day — Annual Athletics Meet</div>
+          <div class="event-meta"><span>📅 Mar 22</span><span>📍 Sports Ground</span></div>
+          <button class="btn-event" onclick="registerEvent(this)">Register Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!--            LEAVE APPLICATION          -->
+  <!-- ══════════════════════════════════════ -->
+  <div id="screen-leave" class="screen">
+    <div class="app-header">
+      <div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div>
+      <div style="font-size:16px;font-weight:800">Leave Application</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="scroll-content">
+      <div class="card leave-form">
+        <div style="font-size:16px;font-weight:800;margin-bottom:16px">Apply for Leave</div>
+        <div class="input-group"><label>Leave Type</label>
+          <select><option>Medical Leave</option><option>Personal Leave</option><option>Emergency Leave</option><option>Study Leave</option></select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="input-group"><label>From Date</label><input type="date" value="2025-02-20"></div>
+          <div class="input-group"><label>To Date</label><input type="date" value="2025-02-21"></div>
+        </div>
+        <div class="input-group"><label>Reason</label>
+          <textarea placeholder="Brief description of your leave reason...">Attending a family medical appointment that requires my presence.</textarea>
+        </div>
+        <button class="btn-primary" onclick="showToast('Leave application submitted! 📝')">Submit Application</button>
+      </div>
+
+      <div class="leave-history">
+        <div class="section-title">Leave History</div>
+        <div class="leave-item">
+          <div class="leave-left"><div class="leave-type">Medical Leave</div><div class="leave-dates">Jan 15–16, 2025 · 2 days</div></div>
+          <span class="leave-status bg-green c-green">Approved</span>
+        </div>
+        <div class="leave-item">
+          <div class="leave-left"><div class="leave-type">Personal Leave</div><div class="leave-dates">Dec 10, 2024 · 1 day</div></div>
+          <span class="leave-status bg-green c-green">Approved</span>
+        </div>
+        <div class="leave-item">
+          <div class="leave-left"><div class="leave-type">Emergency Leave</div><div class="leave-dates">Nov 5–6, 2024 · 2 days</div></div>
+          <span class="leave-status bg-orange c-orange">Pending</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!--            PERFORMANCE                -->
+  <!-- ══════════════════════════════════════ -->
+  <div id="screen-performance" class="screen">
+    <div class="app-header">
+      <div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div>
+      <div style="font-size:16px;font-weight:800">Performance</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="scroll-content">
+      <div class="card" style="background:linear-gradient(135deg,#059669,#0891b2);border:none;color:white;margin-bottom:16px">
+        <div style="font-size:13px;opacity:.75;font-weight:600;margin-bottom:8px">OVERALL PERFORMANCE</div>
+        <div style="font-size:14px;opacity:.8;margin-bottom:16px">Ranking 12th in class of 60 students</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center">
+          <div><div style="font-size:24px;font-weight:800">8.4</div><div style="font-size:11px;opacity:.75">CGPA</div></div>
+          <div><div style="font-size:24px;font-weight:800">82%</div><div style="font-size:11px;opacity:.75">Attend.</div></div>
+          <div><div style="font-size:24px;font-weight:800">Top 20%</div><div style="font-size:11px;opacity:.75">Class Rank</div></div>
+        </div>
+      </div>
+      <div class="section-title">SGPA Trend</div>
+      <div class="card" style="padding:20px">
+        <div style="display:flex;align-items:flex-end;gap:8px;height:80px;margin-bottom:8px">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="flex:1;width:100%;background:var(--primary);border-radius:6px 6px 0 0;opacity:0.5;min-height:20%;height:60%"></div><div style="font-size:10px;color:var(--text3)">S1</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="flex:1;width:100%;background:var(--primary);border-radius:6px 6px 0 0;opacity:0.65;height:72%"></div><div style="font-size:10px;color:var(--text3)">S2</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="flex:1;width:100%;background:var(--primary);border-radius:6px 6px 0 0;opacity:0.75;height:81%"></div><div style="font-size:10px;color:var(--text3)">S3</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="flex:1;width:100%;background:var(--primary);border-radius:6px 6px 0 0;opacity:0.85;height:86%"></div><div style="font-size:10px;color:var(--text3)">S4</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="flex:1;width:100%;background:var(--primary);border-radius:6px 6px 0 0;height:84%"></div><div style="font-size:10px;color:var(--text3)">S5</div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2)">
+          <span>7.6 → 7.8 → 8.1 → 8.6 → 8.4</span>
+        </div>
+      </div>
+      <div class="section-title" style="margin-top:8px">By Subject</div>
+      <div class="perf-card">
+        <div class="perf-subject">📐 Data Structures</div>
+        <div class="perf-grid">
+          <div class="perf-metric"><div class="perf-val c-green">A+</div><div class="perf-lbl">Grade</div></div>
+          <div class="perf-metric"><div class="perf-val c-green">91%</div><div class="perf-lbl">Attend</div></div>
+          <div class="perf-metric"><div class="perf-val c-blue">94%</div><div class="perf-lbl">Marks</div></div>
+        </div>
+      </div>
+      <div class="perf-card">
+        <div class="perf-subject">💾 DBMS</div>
+        <div class="perf-grid">
+          <div class="perf-metric"><div class="perf-val c-orange">B</div><div class="perf-lbl">Grade</div></div>
+          <div class="perf-metric"><div class="perf-val c-red">68%</div><div class="perf-lbl">Attend</div></div>
+          <div class="perf-metric"><div class="perf-val c-orange">70%</div><div class="perf-lbl">Marks</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!--            MESSAGES                   -->
+  <!-- ══════════════════════════════════════ -->
+  <div id="screen-messages" class="screen">
+    <div class="app-header">
+      <div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div>
+      <div style="font-size:16px;font-weight:800">Messages</div>
+      <div class="icon-btn">✏️</div>
+    </div>
+    <div class="scroll-content">
+      <div style="margin-bottom:16px">
+        <input style="width:100%;padding:12px 16px;border-radius:14px;border:2px solid var(--border);background:var(--bg);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;outline:none" placeholder="🔍  Search messages...">
+      </div>
+      <div class="msg-list">
+        <div class="msg-item"><div class="msg-avatar bg-blue">👩‍🏫</div><div class="msg-body"><div class="msg-name">Prof. Kumar</div><div class="msg-preview">Assignment deadline extended to Feb 25th. Please...</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div class="msg-time">10:30</div><div class="msg-unread"></div></div></div>
+        <div class="msg-item"><div class="msg-avatar bg-purple">👥</div><div class="msg-body"><div class="msg-name">CS-5A Group</div><div class="msg-preview">Ravi: Anyone done the networks assignment?</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div class="msg-time">9:15</div><div class="msg-unread"></div></div></div>
+        <div class="msg-item"><div class="msg-avatar bg-green">👩‍🏫</div><div class="msg-body"><div class="msg-name">Prof. Meena</div><div class="msg-preview">Great work on the OS assignment! Score: 47/50</div></div><div><div class="msg-time">Yesterday</div></div></div>
+        <div class="msg-item"><div class="msg-avatar bg-orange">🏫</div><div class="msg-body"><div class="msg-name">Admin Office</div><div class="msg-preview">Fee payment reminder — last date Feb 28</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div class="msg-time">Mon</div><div class="msg-unread"></div></div></div>
+        <div class="msg-item"><div class="msg-avatar" style="background:#fef2f2">🧑</div><div class="msg-body"><div class="msg-name">Priya Nair</div><div class="msg-preview">Can you share the DS notes from today's class?</div></div><div><div class="msg-time">Sun</div></div></div>
+        <div class="msg-item"><div class="msg-avatar" style="background:#f0fdf4">🧑‍💻</div><div class="msg-body"><div class="msg-name">Rahul Gupta</div><div class="msg-preview">Let's form a group for the hackathon!</div></div><div><div class="msg-time">Sat</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!--            NOTIFICATIONS              -->
+  <!-- ══════════════════════════════════════ -->
+  <div id="screen-notifications" class="screen">
+    <div class="app-header">
+      <div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div>
+      <div style="font-size:16px;font-weight:800">Notifications</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="scroll-content">
+      <div class="section-title">New (3)</div>
+      <div class="notif-item"><div class="notif-icon bg-blue">📁</div><div style="flex:1"><div class="notif-title">Assignment Deadline Extended</div><div class="notif-desc">Prof. Kumar extended the Dijkstra's assignment deadline to Feb 25th.</div><div class="notif-time">10:30 AM · Today</div></div><div class="notif-dot"></div></div>
+      <div class="notif-item"><div class="notif-icon bg-orange">⚠️</div><div style="flex:1"><div class="notif-title">Low Attendance Warning</div><div class="notif-desc">Your DBMS attendance is 68%, below the required 75% threshold.</div><div class="notif-time">9:00 AM · Today</div></div><div class="notif-dot"></div></div>
+      <div class="notif-item"><div class="notif-icon bg-green">🎉</div><div style="flex:1"><div class="notif-title">Hackathon Registration Open</div><div class="notif-desc">National Level Hackathon 2025 registrations are now open. Hurry!</div><div class="notif-time">8:00 AM · Today</div></div><div class="notif-dot"></div></div>
+      <div class="section-title" style="margin-top:8px">Earlier</div>
+      <div class="notif-item" style="opacity:0.7"><div class="notif-icon bg-purple">📊</div><div style="flex:1"><div class="notif-title">Mid-Sem Results Published</div><div class="notif-desc">Your Semester 5 mid-semester marks are now available.</div><div class="notif-time">Yesterday · 3:00 PM</div></div></div>
+      <div class="notif-item" style="opacity:0.7"><div class="notif-icon bg-green">✅</div><div style="flex:1"><div class="notif-title">Leave Approved</div><div class="notif-desc">Your medical leave for Jan 15–16 has been approved by Prof. Kumar.</div><div class="notif-time">Jan 14 · 11:00 AM</div></div></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!--            PROFILE                    -->
+  <!-- ══════════════════════════════════════ -->
+  <div id="screen-profile" class="screen">
+    <div class="app-header">
+      <div class="header-left"><button class="back-btn" onclick="navigate('home')">← Back</button></div>
+      <div style="font-size:16px;font-weight:800">Profile</div>
+      <div class="icon-btn">✏️</div>
+    </div>
+    <div class="scroll-content">
+      <div class="profile-hero">
+        <div class="profile-avatar-lg">👨‍🎓</div>
+        <div class="profile-name">Arjun Sharma</div>
+        <div class="profile-role">Student · CSE · Semester 5</div>
+      </div>
+      <div class="card">
+        <div class="profile-item"><div class="profile-icon bg-blue">🎓</div><div><div class="profile-item-label">Roll Number</div><div class="profile-item-value">2021CS042</div></div></div>
+        <div class="profile-item"><div class="profile-icon bg-purple">🏫</div><div><div class="profile-item-label">Department</div><div class="profile-item-value">Computer Science & Engineering</div></div></div>
+        <div class="profile-item"><div class="profile-icon bg-green">📧</div><div><div class="profile-item-label">Email</div><div class="profile-item-value"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3f5e4d554a51114c7f5c5e524f4a4c115a5b4a">[email&#160;protected]</a></div></div></div>
+        <div class="profile-item"><div class="profile-icon bg-orange">📱</div><div><div class="profile-item-label">Phone</div><div class="profile-item-value">+91 98765 43210</div></div></div>
+        <div class="profile-item"><div class="profile-icon bg-red">📅</div><div><div class="profile-item-label">Batch</div><div class="profile-item-value">2021–2025</div></div></div>
+        <div class="profile-item"><div class="profile-icon bg-blue">🏠</div><div><div class="profile-item-label">Hostel</div><div class="profile-item-value">Block C, Room 214</div></div></div>
+      </div>
+      <div class="card" style="margin-top:10px">
+        <div style="font-size:15px;font-weight:800;margin-bottom:16px">Academic Summary</div>
+        <div class="stat-grid" style="margin-bottom:0">
+          <div class="stat-card"><div class="stat-label">CGPA</div><div class="stat-value c-blue">8.4</div></div>
+          <div class="stat-card"><div class="stat-label">Attendance</div><div class="stat-value c-green">82%</div></div>
+        </div>
+      </div>
+      <button class="btn-primary" style="margin-top:12px;background:var(--danger)" onclick="doLogout()">🚪 Sign Out</button>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="navigate('home')"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></button>
+      <button class="nav-item" onclick="navigate('attendance')"><span class="nav-icon">✅</span><span class="nav-label">Attend</span></button>
+      <button class="nav-center-btn">📅</button>
+      <button class="nav-item" onclick="navigate('marks')"><span class="nav-icon">📊</span><span class="nav-label">Marks</span></button>
+      <button class="nav-item active"><span class="nav-icon">👤</span><span class="nav-label">Profile</span></button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const screens = ['login','home','timetable','attendance','marks','assignments','events','leave','performance','messages','notifications','profile'];
+let currentRole = 'student';
+
+function navigate(name) {
+  screens.forEach(s => {
+    const el = document.getElementById('screen-' + s);
+    if (el) el.classList.remove('active');
+  });
+  const target = document.getElementById('screen-' + name);
+  if (target) target.classList.add('active');
+}
+
+function selectRole(btn, role) {
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentRole = role;
+}
+
+function doLogin() {
+  navigate('home');
+}
+
+function doLogout() {
+  navigate('login');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function registerEvent(btn) {
+  btn.textContent = '✅ Registered!';
+  btn.classList.add('registered');
+  showToast('Registered for event! 🎉');
+}
+
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW error:', err));
+  });
+}
+
+// Set current time
+function updateTime() {
+  const now = new Date();
+  const h = now.getHours().toString().padStart(2,'0');
+  const m = now.getM
