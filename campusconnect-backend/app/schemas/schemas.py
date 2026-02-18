@@ -58,7 +58,7 @@ class ProfileOut(BaseModel):
     cgpa: Optional[float]
 
     class Config:
-        from_attributes = True
+        orm_mode= True
 
 # ─── Attendance ─────────────────────────────────────────────
 
@@ -171,7 +171,7 @@ class LeaveOut(BaseModel):
     applied_at: datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 # ─── Feedback ───────────────────────────────────────────────
 
@@ -202,7 +202,7 @@ class NotificationOut(BaseModel):
     created_at: datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 # ─── Announcements ──────────────────────────────────────────
 
@@ -215,7 +215,7 @@ class AnnouncementOut(BaseModel):
     created_at: datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 # ─── Messages ───────────────────────────────────────────────
 
@@ -249,7 +249,7 @@ class ReminderOut(BaseModel):
     is_done: bool
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 # ─── Hostel ─────────────────────────────────────────────────
 
@@ -268,7 +268,7 @@ class ComplaintOut(BaseModel):
     created_at: datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 # ─── Lost & Found ───────────────────────────────────────────
 
